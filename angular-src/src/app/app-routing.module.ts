@@ -22,6 +22,7 @@ import { DashboardComponent } from './toolbox/dashboard/dashboard.component';
 import { InventoryComponent } from './toolbox/inventory/inventory.component';
 import { CreateProductsComponent } from './toolbox/inventory/create-products/create-products.component';
 import { ToDoComponent } from './toolbox/to-do/to-do.component';
+import { AnalyticsComponent } from './toolbox/analytics/analytics.component';
 
 const appRoutes: Routes = [
     {path: '', component: HomeComponent},
@@ -31,6 +32,7 @@ const appRoutes: Routes = [
         { path: 'inventory', component: InventoryComponent },
         { path: 'createProducts', component: CreateProductsComponent },
         { path: 'toDo', component: ToDoComponent },
+        { path: 'analytics', component: AnalyticsComponent },
     ]},
     // Routes for ebay.
     { path: 'ebay', component: EbayComponent, canActivate: [AuthGuard] },

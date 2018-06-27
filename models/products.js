@@ -15,6 +15,7 @@ const productsSchema = new Schema({
         required: true
     },
     quantity: {
+        quantity: Number, // Total quantity available.
         availableQuantity: Number, // Total quantity available.
         alertQuantity: Number, // The minimum quantity needed to be alerted for reorder,
         pendingOrders: Number, // The quantity that are available but subtracted since ther is a pending order.
@@ -25,6 +26,12 @@ const productsSchema = new Schema({
     barcode: String,
     images: String,
     condition: String,
+    price: {
+        purchasePrice: Number,
+        stockValue: Number
+    },
+    category: String,
+    variationGroup: String,
     location: {
         address: {
             address1: String,
@@ -34,12 +41,21 @@ const productsSchema = new Schema({
             zip: String
         }
     },
+    detail: {
+        weight: Number,
+        height: Number,
+        width: Number,
+        depth: Number
+    },
     binLocation: String,
+    monitor: Boolean,
     linked: {
         ebay: Boolean,
         amazon: Boolean,
         shopify: Boolean
     },
+    createdDate: Date,
+    modifiedDate: Date,
     userId: String
     
 });

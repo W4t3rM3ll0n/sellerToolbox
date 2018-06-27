@@ -32,7 +32,7 @@ module.exports = {
 
     },
 
-    updateProducts: (productsQuery, callback) => {
+    updateProducts: (productsQuery, userId, callback) => {
         const updated = [];
 
         // Update each product from the entire list. Push each product into the 'updated' array and pass it to the callback when we init the promise.
@@ -45,19 +45,34 @@ module.exports = {
                         sku: product.sku,
                         title: product.title,
                         quantity: {
+                            quantity: product.quantity.quantity,
                             availableQuantity: product.quantity.availableQuantity,
                             alertQuantity: product.quantity.alertQuantity,
                             pendingOrders: product.quantity.pendingOrders,
                             neededQuantity: product.quantity.alertQuantity - product.quantity.availableQuantity
                         },
                         description: product.description,
+                        price: {
+                          purchasePrice: product.price.purchasePrice,
+                          stockValue: product.price.stockValue  
+                        },
+                        category: product.category,
+                        variationGroup: product.variationGroup,
                         upc: product.upc,
                         barcode: product.barcode,
                         images: product.images,
                         condition: product.condition,
-                        binLocation: product.binLocation
+                        detail: {
+                            weight: product.detail.weight,
+                            height: product.detail.height,
+                            width: product.detail.width,
+                            depth: product.detail.depth
+                        },
+                        binLocation: product.binLocation,
+                        monitor: product.monitor,
+                        modifiedDate: product.modifiedDate,
                     }
-                    Products.update({_id: product.id}, update, (err, item) => {
+                    Products.update({_id: product.id, userId: userId}, update, (err, item) => {
                        err ? reject(err) : resolve(item);
                     });
                 });
@@ -85,11 +100,11 @@ module.exports = {
 
     },
 
-    deleteProducts: (products, callback) => {
+    deleteProducts: (products, userId, callback) => {
 
         if(typeof products === 'string') {
             // Get the products to be deleted from Angular then delete it.
-            Products.find({_id: products}).remove().exec()
+            Products.find({_id: products, userId: userId}).remove().exec()
                 .then((deleted) => {
                     callback(null, deleted);
             }).catch((err) => {

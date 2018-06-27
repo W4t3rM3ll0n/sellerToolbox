@@ -33,18 +33,33 @@ export class CreateProductsComponent implements OnInit {
       'sku': ['', Validators.required],
       'title': ['', Validators.required],
       'quantity': this._fb.group({
+        'quantity': [''],
         'availableQuantity': [''],
         'alertQuantity': [''],
         'pendingOrders': [0],
         'neededQuantity': [0],
       }),
       'description': [''],
+      'price': this._fb.group({
+        'purchasePrice': [''],
+        'stockValue': [0],
+      }),
+      'category': [''],
+      'variationGroup': [''],
       'upc': [''],
       'barcode': [''],
       'images': [''],
       'condition': [''],
       'location': [''],
-      'binLocation': ['']
+      'detail': this._fb.group({
+        'weight': [0],
+        'height': [0],
+        'width': [0],
+        'depth': [0],
+      }),
+      'binLocation': [''],
+      'monitor': [true],
+      'createdDate': [Date()]
     });
   }
 
@@ -55,7 +70,7 @@ export class CreateProductsComponent implements OnInit {
 
     this.toolboxService.createItems(productsDetail)
       .subscribe((res) => {
-        // console.log(res);
+        console.log(res);
         this.router.navigate(['/toolbox/inventory']);
       },
       (err) => {

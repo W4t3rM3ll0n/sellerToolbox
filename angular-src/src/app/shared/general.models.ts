@@ -4,12 +4,19 @@ export class InventoryGroupRow {
     sku: string;
     title: string;
     quantity: {
+        quantity: number,
         availableQuantity: number,
         alertQuantity: number,
         pendingOrders: number,
         neededQuantity: number
     };
     description: string;
+    price: {
+        purchasePrice: number,
+        stockValue: number
+    };
+    category: string;
+    variationGroup: string;
     upc: string | number;
     barcode: string | number;
     images: string;
@@ -23,8 +30,17 @@ export class InventoryGroupRow {
             zip: number
         }
     };
+    detail: {
+        weight: number;
+        height: number;
+        width: number;
+        depth: number;
+    };
     binLocation: string;
-    linked: boolean
+    monitor: Boolean;
+    linked: boolean;
+    createdDate: Date;
+    modifiedDate: Date;
 }
 
 export class ProductGroupRow {

@@ -8,14 +8,21 @@
           <th scope="col">Title</th>
           <th scope="col">Quantity</th>
           <th scope="col">Alert Quantity</th>
-          <th scope="col"></th>
           <th scope="col">Description</th>
+          <th scope="col">Price</th>
+          <th scope="col">Category</th>
+          <th scope="col">Variation Group</th>
           <th scope="col">UPC</th>
           <th scope="col">Barcode</th>
           <th scope="col">Images</th>
           <th scope="col">Condition</th>
           <th scope="col">Location</th>
+          <th scope="col">Weight</th>
+          <th scope="col">Height</th>
+          <th scope="col">Width</th>
+          <th scope="col">Depth</th>
           <th scope="col">Bin Location</th>
+          <th scope="col">Monitor</th>
           <th scope="col"></th>
         </tr>
       </thead>
@@ -37,7 +44,7 @@
             <td formGroupName="quantity">
               <input
                 type="text"
-                formControlName="availableQuantity"
+                formControlName="quantity"
                 class="form-control-sm">
             </td>
             <td formGroupName="quantity">
@@ -45,8 +52,6 @@
                 type="text"
                 formControlName="alertQuantity"
                 class="form-control-sm">
-            </td>
-            <td formGroupName="quantity">
               <input
                 type="hidden"
                 formControlName="pendingOrders">
@@ -59,6 +64,28 @@
                 (modalOpened)="onDescriptionModalOpened(i, $event)"
                 (modalClosed)="onDescriptionModalClosed(i, $event)"
                 [descriptionGroup]="createProductsForm.controls.products.controls[i]"></app-description-modal>
+            </td>
+            <td formGroupName="price">
+              <input
+                type="text"
+                formControlName="purchasePrice"
+                class="form-control-sm">
+              <input
+                type="hidden"
+                formControlName="stockValue"
+                class="form-control-sm">
+            </td>
+            <td>
+              <input
+                type="text"
+                formControlName="category"
+                class="form-control-sm">
+            </td>
+            <td>
+              <input
+                type="text"
+                formControlName="variationGroup"
+                class="form-control-sm">
             </td>
             <td>
               <input
@@ -90,12 +117,46 @@
                 formControlName="location"
                 class="form-control-sm">
             </td>
+            <td formGroupName="detail">
+              <input
+                type="text"
+                formControlName="weight"
+                class="form-control-sm">
+            </td>
+            <td formGroupName="detail">
+              <input
+                type="text"
+                formControlName="height"
+                class="form-control-sm">
+            </td>
+            <td formGroupName="detail">
+              <input
+                type="text"
+                formControlName="width"
+                class="form-control-sm">
+            </td>
+            <td formGroupName="detail">
+              <input
+                type="text"
+                formControlName="depth"
+                class="form-control-sm">
+            </td>
             <td>
               <input
                 type="text"
                 formControlName="binLocation"
                 class="form-control-sm">
             </td>
+            <td>
+              <input
+                type="text"
+                formControlName="monitor"
+                class="form-control-sm">
+            </td>
+            <input
+              type="hidden"
+              formControlName="createdDate"
+              class="form-control-sm">
  
             <ng-template [ngIf]="createProductsForm.controls.products.controls.length > 1">
               <td (click)="removeProductRow(i)" class="align-middle" style="cursor: pointer;">&times;</td>

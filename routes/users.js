@@ -27,7 +27,11 @@ router.get('/', (req, res, next) => {
 
 // /users/register GET
 router.get('/profile', passport.authenticate('jwt', { session:false }), (req, res, next) => {
-    res.json({user: req.user});
+    res.json({
+        name: req.user.name,
+        username: req.user.username,
+        email: req.user.email
+    });
     
 });
 

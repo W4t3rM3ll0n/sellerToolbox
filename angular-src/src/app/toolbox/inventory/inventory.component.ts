@@ -48,17 +48,32 @@ export class InventoryComponent implements OnInit, OnDestroy {
         'sku': [{value: item.sku, disabled: true}],
         'title': [{value: item.title, disabled: true}],
         'quantity': this._fb.group({
+          'quantity': [{value: item.quantity.quantity, disabled: true}],
           'availableQuantity': [{value: item.quantity.availableQuantity, disabled: true}],
           'alertQuantity': [{value: item.quantity.alertQuantity, disabled: true}],
           'pendingOrders': [{value: item.quantity.pendingOrders, disabled: true}],
           'neededQuantity': [{value: item.quantity.neededQuantity, disabled: true}]
         }),
         'description': [{value: item.description, disabled: true}],
+        'price': this._fb.group({
+          'purchasePrice': [{value: item.price.purchasePrice, disabled: true}],
+          'stockValue': [{value: item.price.stockValue, disabled: true}],
+        }),
+        'category': [{value: item.category, disabled: true}],
+        'variationGroup': [{value: item.variationGroup, disabled: true}],
         'upc': [{value: item.upc, disabled: true}],
         'barcode': [{value: item.barcode, disabled: true}],
         'condition': [{value: item.condition, disabled: true}],
         'location': [{value: item.location, disabled: true}],
-        'binLocation': [{value: item.binLocation, disabled: true}]
+        'detail': this._fb.group({
+          'weight': [{value: item.detail.weight, disabled: true}],
+          'height': [{value: item.detail.height, disabled: true}],
+          'width': [{value: item.detail.width, disabled: true}],
+          'depth': [{value: item.detail.depth, disabled: true}]
+        }),
+        'binLocation': [{value: item.binLocation, disabled: true}],
+        'monitor': [{value: item.monitor, disabled: true}],
+        'modifiedDate': [{value: item.modifiedDate, disabled: true}]
       });
       // Push to the empty array, above.
       control.push(data);
@@ -69,7 +84,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
     if(this.editModeOff) {
       this.initForm();
       const value = form.value;
-      const regex = new RegExp(`${value.search}`, 'i');
+      const regex = new RegExp(value.search, 'i');
       
       // Get the search value, turn it into a string and then split each word seperated by spaces into an array.
       const filterWords: Array<string> = value.search.match(regex).join().split(/\s+/);
@@ -87,7 +102,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
   
         });
       });
-  
+      
       control.value.forEach((row) => { // This loops searches each row and removes the row that doesn't have the 'keep' property.
         if(!row['keep']) {
           const index = control.value.indexOf(row);

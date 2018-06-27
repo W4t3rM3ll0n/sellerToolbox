@@ -73,9 +73,9 @@ module.exports = {
 
     },
 
-    getProducts: (callback) => {
+    getProducts: (userId, callback) => {
 
-        Products.find().exec()
+        Products.find({userId: userId}).exec()
             .then((products) => {
                 callback(null, products);
             })

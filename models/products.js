@@ -39,7 +39,8 @@ const productsSchema = new Schema({
         ebay: Boolean,
         amazon: Boolean,
         shopify: Boolean
-    }
+    },
+    userId: String
     
 });
 

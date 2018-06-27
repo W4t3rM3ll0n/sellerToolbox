@@ -17,6 +17,13 @@ router.get('/', (req, res, next) => {
 router.put('/createProducts', passport.authenticate('jwt', { session:false }), (req, res, next) => {
 
     const products = req.body.products;
+    if(products.length > 1) {
+        products.forEach((product) => {
+            product['userId'] = req.user._id
+        });
+    } else {
+        products[0]['userId'] = req.user._id
+    }
     // console.log(products);
     
     configInventory.addProducts(products, (err, response) => {
@@ -39,8 +46,10 @@ router.post('/updateProducts', passport.authenticate('jwt', { session:false }), 
 
 // Get Products
 router.get('/getProducts', passport.authenticate('jwt', {session: false}), (req, res, next) => {
+    // Search products collection with the user id.
+    const userId = req.user._id;
 
-    configInventory.getProducts((err, products) => {
+    configInventory.getProducts(userId, (err, products) => {
         err ? res.json(err) : res.json(products);
     });
 

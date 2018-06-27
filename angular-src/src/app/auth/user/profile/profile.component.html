@@ -1,0 +1,85 @@
+<div class="row">
+  <div class="col-sm-12">
+    <form (ngSubmit)="onUpdateUser(f)" #f="ngForm">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input 
+          type="text" 
+          name="name"
+          ngModel="{{ user?.name }}"
+          class="form-control"
+        >
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          name="email" 
+          ngModel="{{ user?.email }}"
+          class="form-control"
+        >
+      </div>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input 
+          type="text" 
+          name="username" 
+          ngModel="{{ user?.username }}"
+          class="form-control"
+        >
+      </div>
+      <div class="form-group">
+        <label for="ebayAuthToken">Ebay Auth Token</label>
+        <input
+          type="text"
+          name="ebayAuthToken"
+          ngModel="{{ user?.ebayauthtoken }}"
+          class="form-control"
+        >
+      </div>
+      <div class="form-group">
+        <label for="ebayRefToken">Ebay Refresh Token</label>
+        <input
+          type="text"
+          name="ebayRefToken"
+          ngModel="{{ user?.ebayreftoken }}"
+          class="form-control"
+        >
+      </div>
+      <button 
+        class="btn btn-primary" 
+        type="submit"
+      >Update User</button>
+    </form>
+    <hr>
+    <h3>Change Password</h3>
+    <form (ngSubmit)="onUpdatePassword(p)" #p="ngForm">
+      <div class="form-group">
+        <label for="password">Current Password</label>
+        <input 
+          type="password" 
+          name="password"
+          ngModel
+          class="form-control"
+        >
+      </div>
+      <div class="form-group">
+        <label for="newPassword">New Password</label>
+        <input 
+          type="password" 
+          name="newPassword"
+          ngModel
+          class="form-control"
+        >
+      </div>
+      <button 
+        class="btn btn-primary" 
+        type="submit"
+      >Update Password</button>
+    </form>
+    <hr>
+    <h3>Delete User</h3>
+    <hr>
+    <button (click)="onDeleteUser()" class="btn btn-danger">Delete</button>
+  </div>
+</div>

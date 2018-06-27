@@ -1,0 +1,148 @@
+<h2>Inventory</h2>
+<hr>
+<form class="form-inline" (ngSubmit)="onSearchInventory(s)" #s="ngForm">
+    <input 
+      class="form-control mr-sm-2"
+      type="text"
+      name="search"
+      ngModel
+      placeholder="Search"
+    >
+    <button class="btn btn-secondary" type="submit">Search</button>
+</form>
+<hr>
+<button type="button" class="btn btn-outline-warning mr-sm-2" routerLink="/toolbox/createProducts">Create</button>
+<button type="button" class="btn btn-outline-warning mr-sm-2" (click)="onEditItems()" *ngIf="editModeOff === true">Edit</button>
+<button type="button" class="btn btn-outline-warning mr-sm-2" (click)="onEditItems()" *ngIf="editModeOff === false">&times;</button>
+<button type="button" class="btn btn-outline-danger mr-sm-2" (click)="onDeleteMultiItems()" *ngIf="editModeOff === false">Delete</button>
+
+<br><br>
+
+<div id="scrollStyle" class="horizontal-scroll">
+  <form *ngIf="updateProductsForm" [formGroup]="updateProductsForm" (ngSubmit)="onCreateProducts()">
+    <table *ngIf="inventory" formArrayName="products" class="table table-hover cell-border">
+      <thead>
+        <tr class="table-warning">
+          <th scope="col"></th>
+          <!-- <th scope="col">Images</th> -->
+          <th scope="col" *ngIf="editModeOff === false">Image Links</th>
+          <th scope="col">SKU</th>
+          <th scope="col">Title</th>
+          <th scope="col">Quantity</th>
+          <th scope="col">Alert Quantity</th>
+          <th scope="col">Pending Orders</th>
+          <th scope="col">Needed Quantity</th>
+          <th scope="col">Description</th>
+          <th scope="col">UPC</th>
+          <th scope="col">Barcode</th>
+          <th scope="col">Condition</th>
+          <th scope="col">Location</th>
+          <th scope="col">Bin Location</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody *ngFor="let product of updateProductsForm.controls.products.controls; let i=index;">
+        <tr class="cell-border" [formGroupName]="i" (click)="onSelectItem(i)">
+          <td class="align-middle">{{i + 1}}</td>
+            <input 
+              type="hidden"
+              formControlName="id">
+            <!-- <td class="align-middle">
+              <div class="outer-thumbnail-img" *ngIf="inventory">
+                <img src="{{inventory[i].images}}" alt="placeholder" class="img-thumbnail d-block mx-auto">
+              </div>
+            </td> -->
+            <td class="align-middle" *ngIf="editModeOff === false">
+                <input 
+                  type="text"
+                  class="form-control-sm"
+                  formControlName="images">
+            </td>
+            <td class="align-middle">
+              <input 
+                type="text"
+                class="form-control-sm"
+                formControlName="sku">
+            </td>
+            <td class="align-middle">
+              <input 
+                type="text"
+                class="form-control-sm"
+                formControlName="title">
+            </td>
+            <td formGroupName="quantity" class="align-middle">
+              <input 
+                type="text"
+                class="form-control-sm"
+                formControlName="availableQuantity">
+            </td>
+            <td formGroupName="quantity" class="align-middle">
+              <input 
+                type="text"
+                class="form-control-sm"
+                formControlName="alertQuantity">
+            </td>
+            <td formGroupName="quantity" class="align-middle">
+              <input 
+                type="text"
+                class="form-control-sm"
+                formControlName="pendingOrders">
+            </td>
+            <td formGroupName="quantity" class="align-middle">
+              <input 
+                type="text"
+                class="form-control-sm"
+                formControlName="neededQuantity">
+            </td>
+            <td class="align-middle">
+              <input 
+                type="text"
+                class="form-control-sm"
+                formControlName="description">
+            </td>
+            <td class="align-middle">
+              <input 
+                type="text"
+                class="form-control-sm"
+                formControlName="upc">
+            </td>
+            <td class="align-middle">
+              <input 
+                type="text"
+                class="form-control-sm"
+                formControlName="barcode">
+            </td>
+            <td class="align-middle">
+              <input 
+                type="text"
+                class="form-control-sm"
+                formControlName="condition">
+            </td>
+            <td class="align-middle">
+              <input 
+                type="text"
+                class="form-control-sm"
+                formControlName="location">
+            </td>
+            <td class="align-middle">
+              <input 
+                type="text"
+                class="form-control-sm"
+                formControlName="binLocation">
+            </td>
+          
+            <ng-template [ngIf]="updateProductsForm.controls.products.controls.length > 0 && editModeOff === false">
+              <td (click)="onDeleteSingleItems(i)" class="align-middle" style="cursor: pointer;">&times;</td>
+            </ng-template>
+
+            <ng-template [ngIf]="editModeOff === true">
+              <td class="align-middle"></td>
+            </ng-template>
+
+        </tr>
+      </tbody>
+    </table> 
+    <button type="button" class="btn btn-outline-success mr-sm-2" (click)="onUpdateItems()" *ngIf="editModeOff === false">Update</button>
+    <br><br>
+  </form>
+</div>

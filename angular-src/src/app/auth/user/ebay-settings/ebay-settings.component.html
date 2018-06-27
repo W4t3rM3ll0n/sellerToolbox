@@ -1,0 +1,59 @@
+<div class="row">
+  <div class="col-sm-12">
+    <app-tokens></app-tokens>
+    <h3>Opt Into Selling Policy Management</h3>
+    <hr>
+    <button (click)="onOptInToSPM()" class="btn btn-success btn-block">optInTo</button>
+    <button (click)="onGetOptInPrograms()" class="btn btn-success btn-block">Get Opt In Programs</button>
+    <hr>
+    <form (ngSubmit)="updateEbaySettings(f)" #f="ngForm">
+      <div class="form-group">
+        <label for="placeholder">Placeholder</label>
+        <input 
+          type="text" 
+          name="placeholder"
+          ngModel="PlaceHolder"
+          class="form-control"
+        >
+      </div>
+      <button 
+        class="btn btn-primary" 
+        type="submit"
+      >Update Settings</button>
+    </form>
+  </div>
+</div>
+<br>
+<!-- Ebay Account Polices -->
+<div class="row">
+  <div class="col-sm-12">
+    <h3>Ebay Policies</h3>
+    <hr>
+    <p class="h5">Fulfillment Polices</p>
+    <hr>
+      <div *ngFor="let policy of policies">
+        <ul class="list-group" *ngFor="let fulfillment of policy.fulfillmentPolicies">
+          Name: <li class="list-group-item"> {{ fulfillment.name }} </li>
+          Policy ID: <li class="list-group-item"> {{ fulfillment.fulfillmentPolicyId }} </li>
+        </ul>
+      </div>
+    <hr>
+    <p class="h5">Payment Polices</p>
+    <hr>
+      <div *ngFor="let policy of policies">
+        <ul class="list-group" *ngFor="let payment of policy.paymentPolicies">
+          Name: <li class="list-group-item"> {{ payment.name }} </li>
+          Policy ID: <li class="list-group-item"> {{ payment.paymentPolicyId }} </li>
+        </ul>
+      </div>
+    <hr>
+    <p class="h5">Return Polices</p>
+    <hr>
+      <div *ngFor="let policy of policies">
+        <ul class="list-group" *ngFor="let return of policy.returnPolicies">
+          Name: <li class="list-group-item"> {{ return.name }} </li>
+          Policy ID: <li class="list-group-item"> {{ return.returnPolicyId }} </li>
+        </ul>
+      </div>
+  </div>
+</div>

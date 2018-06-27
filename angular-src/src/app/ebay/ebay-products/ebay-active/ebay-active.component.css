@@ -1,0 +1,11 @@
+.btn {
+    border-color: rgba(255, 255, 0, 0.6);
+}
+
+.cell-border {
+    border: rgba(255, 255, 255) 1px solid;
+}
+
+.img-thumbnail {
+    max-width: 80px;
+}

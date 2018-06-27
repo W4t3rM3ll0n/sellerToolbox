@@ -62,5 +62,6 @@ typings/
 
 # all other files
 package-lock.json
-plans.txt
+plans.html
 /public
+sellerToolbox.txt

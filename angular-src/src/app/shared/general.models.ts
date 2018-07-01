@@ -46,3 +46,8 @@ export class InventoryGroupRow {
 export class ProductGroupRow {
     value: InventoryGroupRow
 }
+
+// Address Model
+export class AddressModel {
+
+}

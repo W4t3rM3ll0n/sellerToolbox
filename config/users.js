@@ -49,6 +49,85 @@ module.exports = {
         });
     },
 
+    addUpdateAddress(address, userId, callback) {
+
+        const updateList = [];
+        const newList = [];
+
+        // Split the addresses submitted with the [newList] and [updateList]. newList === New Addresses, updateList === Existing Addresses.
+        const organize = () => {
+            return new Promise((resolve, reject) => {
+                if(this === null) { 
+                    reject();
+                } else {
+                    address.map((item) => {
+                        if(item.id === '') {
+                            newList.push(item);
+                        } else {
+                            updateList.push(item);
+                        }
+                        resolve();
+                    });
+                }
+            });
+        }
+
+        // Update and existing addresses that has been submitted.
+        const updateAddress = () => {
+            return new Promise((resolve, reject) => {
+                // Update addresses for user account
+                Users.findById({_id: userId})
+                    .then(() => {
+                        Users.update({_id: userId}, { $set: { addresses: [...updateList] } }, (err, updated) => {
+                            err ? reject(err) : resolve(updated);
+                        });
+                    })
+                .catch(err => reject(err));
+            });
+        }       
+        
+        // Add new addresses if any were submitted. Add the [newList].length + the length of how many are in the database. Then limit it to 5.
+        const addNewAddress = (chain) => {
+            return new Promise((resolve, reject) => {
+                // Add addresses for user account
+                Users.findById({_id: userId})
+                    .then((data) => {
+                        if(newList.length + data.addresses.length <= 5) {
+                            Users.update({_id: userId}, { $push: { addresses: { $each: newList }}}, (err, added) => {
+                                err ? reject(err) : resolve(JSON.stringify(chain)+ ' ' +JSON.stringify(added));
+                            });
+                        } else {
+                            reject('Can only have up to 5 addresses');
+                        }
+                    })
+                .catch(err => reject(err));
+            });
+        }
+
+        organize()
+            .then(() => {
+                if(updateList.length > 0) {
+                    return updateAddress();
+                }
+            })
+            .then((result) => {
+                if(newList.length > 0) {
+                    return addNewAddress(result);
+                } else {
+                    return JSON.stringify(result);
+                }
+            })
+            .then((done) => {
+                callback(null, done);
+            })
+        .catch(err => callback(err, null));
+
+    },
+
+    deleteAddress: (callback) => {
+        callback(null, 'delete address config function working');
+    },
+
     updatePassword: (user, updatePassword, callback) => {
 
         bcrypt.genSalt(10, (err, saltRounds) => {
@@ -69,9 +148,9 @@ module.exports = {
         });
     },
 
-    deleteUser: (user, callback) => {
+    deleteUser: (userId, callback) => {
         // In order to find(), the entire object is expected as a parameter.
-        Users.find(user).remove().exec()
+        Users.find({_id: userId}).remove().exec()
             .then((deleted) => {
                 callback(null, deleted);
         }).catch((err) => {

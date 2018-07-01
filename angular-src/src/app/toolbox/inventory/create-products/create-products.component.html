@@ -153,10 +153,6 @@
                 formControlName="monitor"
                 class="form-control-sm">
             </td>
-            <input
-              type="hidden"
-              formControlName="createdDate"
-              class="form-control-sm">
  
             <ng-template [ngIf]="createProductsForm.controls.products.controls.length > 1">
               <td (click)="removeProductRow(i)" class="align-middle" style="cursor: pointer;">&times;</td>

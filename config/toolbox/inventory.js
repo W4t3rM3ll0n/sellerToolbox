@@ -46,7 +46,7 @@ module.exports = {
                         title: product.title,
                         quantity: {
                             quantity: product.quantity.quantity,
-                            availableQuantity: product.quantity.availableQuantity,
+                            availableQuantity: product.quantity.quantity - product.quantity.pendingOrders,
                             alertQuantity: product.quantity.alertQuantity,
                             pendingOrders: product.quantity.pendingOrders,
                             neededQuantity: product.quantity.alertQuantity - product.quantity.availableQuantity
@@ -54,7 +54,7 @@ module.exports = {
                         description: product.description,
                         price: {
                           purchasePrice: product.price.purchasePrice,
-                          stockValue: product.price.stockValue  
+                          stockValue: product.price.stockValue
                         },
                         category: product.category,
                         variationGroup: product.variationGroup,

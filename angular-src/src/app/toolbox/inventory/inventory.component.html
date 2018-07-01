@@ -48,7 +48,6 @@
           <th scope="col">Depth</th>
           <th scope="col">Bin Location</th>
           <th scope="col">Monitor</th>
-          <th scope="col">Modified Date</th>
           <th scope="col"></th>
         </tr>
       </thead>
@@ -200,12 +199,6 @@
                 type="text"
                 class="form-control-sm"
                 formControlName="monitor">
-            </td>
-            <td class="align-middle">
-              <input 
-                type="text"
-                class="form-control-sm"
-                formControlName="modifiedDate">
             </td>
           
             <ng-template [ngIf]="updateProductsForm.controls.products.controls.length > 0 && editModeOff === false">

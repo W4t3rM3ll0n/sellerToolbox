@@ -58,8 +58,7 @@ export class CreateProductsComponent implements OnInit {
         'depth': [0],
       }),
       'binLocation': [''],
-      'monitor': [true],
-      'createdDate': [Date()]
+      'monitor': [true]
     });
   }
 

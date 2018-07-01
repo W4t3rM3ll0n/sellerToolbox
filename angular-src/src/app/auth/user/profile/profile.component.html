@@ -7,8 +7,7 @@
           type="text" 
           name="name"
           ngModel="{{ user?.name }}"
-          class="form-control"
-        >
+          class="form-control">
       </div>
       <div class="form-group">
         <label for="email">Email</label>
@@ -16,8 +15,7 @@
           type="email" 
           name="email" 
           ngModel="{{ user?.email }}"
-          class="form-control"
-        >
+          class="form-control">
       </div>
       <div class="form-group">
         <label for="username">Username</label>
@@ -25,33 +23,97 @@
           type="text" 
           name="username" 
           ngModel="{{ user?.username }}"
-          class="form-control"
-        >
+          class="form-control">
       </div>
-      <!-- <div class="form-group">
-        <label for="ebayAuthToken">Ebay Auth Token</label>
-        <input
-          type="text"
-          name="ebayAuthToken"
-          ngModel="{{ user?.ebayauthtoken }}"
-          class="form-control"
-        >
-      </div>
-      <div class="form-group">
-        <label for="ebayRefToken">Ebay Refresh Token</label>
-        <input
-          type="text"
-          name="ebayRefToken"
-          ngModel="{{ user?.ebayreftoken }}"
-          class="form-control"
-        >
-      </div> -->
       <button 
         class="btn btn-primary" 
-        type="submit"
-      >Update User</button>
+        type="submit">Update User</button>
     </form>
     <hr>
+    <!-- Addresses -->
+    <h3>Addresses</h3>
+    <div id="scrollStyle" class="horizontal-scroll">
+      <form *ngIf="addUpdateAddressForm" [formGroup]="addUpdateAddressForm" (ngSubmit)="onAddUpdateAddress()">
+        <table formArrayName="addresses" class="table table-hover cell-border">
+          <thead>
+            <tr class="table-success">
+              <th scope="col"></th>
+              <th scope="col">Address 1</th>
+              <th scope="col">Address 2</th>
+              <th scope="col">City</th>
+              <th scope="col">State</th>
+              <th scope="col">Zip</th>
+              <th scope="col">Primary</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody *ngFor="let address of addUpdateAddressForm.controls.addresses.controls; let i=index;">
+            <tr class="cell-border" [formGroupName]="i">
+              <td class="align-middle">{{i + 1}}</td>
+
+              <input 
+                type="hidden"
+                class="form-control"
+                formControlName="id">
+
+              <td class="align-middle">
+                  <input 
+                    type="text"
+                    class="form-control"
+                    formControlName="address1">
+              </td>
+              <td class="align-middle">
+                  <input 
+                    type="text"
+                    class="form-control"
+                    formControlName="address2">
+              </td>
+              <td class="align-middle">
+                  <input 
+                    type="text"
+                    class="form-control"
+                    formControlName="city">
+              </td>
+              <td class="align-middle">
+                  <input 
+                    type="text"
+                    class="form-control"
+                    formControlName="state">
+              </td>
+              <td class="align-middle">
+                  <input 
+                    type="text"
+                    class="form-control"
+                    formControlName="zip">
+              </td>
+              <td class="align-middle">
+                  <input 
+                    type="radio"
+                    class="form-control"
+                    name="primary"
+                    [value]="true"
+                    formControlName="primary">
+              </td>
+              
+              <ng-template [ngIf]="addUpdateAddressForm.controls.addresses.controls.length > 1">
+                <td (click)="removeAddressRow(i)" class="align-middle" style="cursor: pointer;">&times;</td>
+              </ng-template>
+
+              <ng-template [ngIf]="addUpdateAddressForm.controls.addresses.controls.length === 1">
+                <td></td>
+              </ng-template>
+            
+            </tr>
+          </tbody>
+        </table> 
+        <button type="button" class="btn btn-outline-warning mr-sm-2" (click)="onAddAddress()">Add</button>
+        <button type="submit" class="btn btn-outline-success mr-sm-2">Submit</button>
+        <br><br>
+      </form>
+    </div>
+
+    <hr>
+    <!-- Change Password -->
     <h3>Change Password</h3>
     <form (ngSubmit)="onUpdatePassword(p)" #p="ngForm">
       <div class="form-group">
@@ -78,6 +140,7 @@
       >Update Password</button>
     </form>
     <hr>
+    <!-- Delete User -->
     <h3>Delete User</h3>
     <hr>
     <button (click)="onDeleteUser()" class="btn btn-danger">Delete</button>

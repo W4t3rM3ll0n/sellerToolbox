@@ -30,9 +30,9 @@ router.get('/profile', passport.authenticate('jwt', { session:false }), (req, re
     res.json({
         name: req.user.name,
         username: req.user.username,
-        email: req.user.email
+        email: req.user.email,
+        addresses: req.user.addresses
     });
-    
 });
 
 // /users/getAuthToken, This gets the ebay Auth and Refresh tokens. 
@@ -50,7 +50,8 @@ router.post('/register', (req, res, next) => {
         email: req.body.email,
         password: req.body.password,
         ebayauthtoken: '',
-        ebayreftoken: ''
+        ebayreftoken: '',
+        addresses: [],
     }
 
     configUsers.addUser(regUser, (err, user) => {
@@ -113,6 +114,27 @@ router.post('/update', passport.authenticate('jwt', { session:false }), (req, re
 
 });
 
+router.post('/addUpdateAddress', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+    const address = req.body.addresses;
+    const userId = req.user._id;
+
+    // console.log(address);
+
+    configUsers.addUpdateAddress(address, userId, (err, result) => {
+        err ? res.json({error: `You have an error: ${err}`}) : res.json({success: `Success: ${result}`});
+    });
+
+});
+
+router.post('/deleteAddress', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+    console.log('delete address route working');
+
+    configUsers.deleteAddress((err, deleted) => {
+        console.log(deleted);
+    });
+    
+});
+
 // /users/updatepw PASSWORD
 router.post('/updatepw', passport.authenticate('jwt', { session:false }), (req, res, next) => {
 
@@ -149,9 +171,9 @@ router.post('/updatepw', passport.authenticate('jwt', { session:false }), (req, 
 router.delete('/deleteUser', passport.authenticate('jwt', { session:false }), (req, res, next) => {
 
     // We pass in the entire user object
-    const user = req.user
+    const userId = req.user._id;
 
-    configUsers.deleteUser(user, (err, deleted) => {
+    configUsers.deleteUser(userId, (err, deleted) => {
         err ? res.json({success: false, msg:'Failed to delete user: ' + err}) : res.json({success: true, msg:'User has been deleted'});
     });
 

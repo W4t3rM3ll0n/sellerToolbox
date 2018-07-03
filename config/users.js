@@ -61,7 +61,7 @@ module.exports = {
                     reject();
                 } else {
                     address.map((item) => {
-                        if(item.id === '') {
+                        if(item._id === '') {
                             newList.push(item);
                         } else {
                             updateList.push(item);
@@ -78,9 +78,11 @@ module.exports = {
                 // Update addresses for user account
                 Users.findById({_id: userId})
                     .then(() => {
-                        Users.update({_id: userId}, { $set: { addresses: [...updateList] } }, (err, updated) => {
-                            err ? reject(err) : resolve(updated);
-                        });
+                        Users.update({_id: userId}, { $set: { addresses: [...updateList] } })
+                            .then((updated) => {
+                                resolve(updated);
+                            })
+                        .catch(err => reject(err));
                     })
                 .catch(err => reject(err));
             });
@@ -93,9 +95,11 @@ module.exports = {
                 Users.findById({_id: userId})
                     .then((data) => {
                         if(newList.length + data.addresses.length <= 5) {
-                            Users.update({_id: userId}, { $push: { addresses: { $each: newList }}}, (err, added) => {
-                                err ? reject(err) : resolve(JSON.stringify(chain)+ ' ' +JSON.stringify(added));
-                            });
+                            Users.update({_id: userId}, { $push: { addresses: { $each: newList }}})
+                                .then((added) => {
+                                    resolve(JSON.stringify(chain)+ ' ' +JSON.stringify(added))
+                                })
+                            .catch(err => reject(err));
                         } else {
                             reject('Can only have up to 5 addresses');
                         }
@@ -124,8 +128,13 @@ module.exports = {
 
     },
 
-    deleteAddress: (callback) => {
-        callback(null, 'delete address config function working');
+    deleteAddress: (addressId, userId, callback) => {
+        // Find the user then delete the address by id.
+        Users.update({ _id: userId }, { $pull: { addresses: { _id: addressId } } })
+            .then((address) => {
+                callback(null, address);
+            })
+        .catch((err) => callback(err, null));
     },
 
     updatePassword: (user, updatePassword, callback) => {

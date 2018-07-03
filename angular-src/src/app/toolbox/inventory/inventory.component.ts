@@ -169,7 +169,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
     const item = control.value[rowIndex].id;
 
     const dblCheck = confirm('Are you sure you want to delete this item?');
-    if(dblCheck === true) {
+    if(dblCheck) {
       // Remove from the client.
       control.removeAt(rowIndex);
       // Call toolbox service to delete item from the database.

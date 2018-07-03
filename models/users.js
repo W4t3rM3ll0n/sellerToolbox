@@ -24,7 +24,6 @@ const usersSchema = new Schema({
     },
     addresses: {
         type: [{
-            id: String,
             address1: {
                 type: String,
                 required: true

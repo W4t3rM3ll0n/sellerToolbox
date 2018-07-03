@@ -127,12 +127,16 @@ router.post('/addUpdateAddress', passport.authenticate('jwt', { session: false }
 });
 
 router.post('/deleteAddress', passport.authenticate('jwt', { session: false }), (req, res, next) => {
-    console.log('delete address route working');
+    const addressId = req.body.addressId;
+    const userId = req.user._id;
 
-    configUsers.deleteAddress((err, deleted) => {
-        console.log(deleted);
+    // console.log(addressId);
+    // console.log(userId);
+
+    configUsers.deleteAddress(addressId, userId, (err, deleted) => {
+        err ? res.json({error: `You have an error: ${err}`}) : res.json({success: `Address has been deleted: ${JSON.stringify(deleted)}`});
     });
-    
+
 });
 
 // /users/updatepw PASSWORD

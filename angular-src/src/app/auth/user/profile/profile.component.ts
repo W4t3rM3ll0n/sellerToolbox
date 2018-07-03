@@ -24,7 +24,7 @@ export class ProfileComponent implements OnInit {
     this.authService.getProfile()
       .subscribe(profile => {
         this.user = profile;
-        // console.log(this.user);
+        console.log(this.user);
         return this.user;
       },
       err => {
@@ -104,15 +104,25 @@ export class ProfileComponent implements OnInit {
 
   onAddAddress() {
     const control = <FormArray>this.addUpdateAddressForm.controls['addresses'];
-    console.log(control)
+    // console.log(control)
     if(control.length < 5) {
       const data = this.blankFormRow();
+      // console.log(data);
       return control.push(data);
     };
   }
 
-  onAddUpdateAddress() {
+  onAddUpdateAddress() { // This method still has bugs 07/02/18. Use the work around for now.
     const address = this.addUpdateAddressForm.value.addresses;
+
+    address.forEach((row) => {
+      // console.log(row.primary);
+      row.primary === 'checked' ? row.primary = true : row.primary = false;
+      
+    });
+
+    // console.log(address);
+
     this.authService.addUpdateAddress(address)
       .subscribe((res) => {
         console.log(res);
@@ -123,15 +133,27 @@ export class ProfileComponent implements OnInit {
   removeAddressRow(rowIndex: number) {
     // Remove a product row
     const control = <FormArray>this.addUpdateAddressForm.controls['addresses'];
-    control.removeAt(rowIndex);
-    this.authService.deleteAddress()
-      .subscribe((res) => {
-        console.log(res);
-      },
-      (err) => {
-        console.log(err);
+    const addressId = control.value[rowIndex].id;
+
+    if(addressId !== '') {
+      const dblCheck = confirm('Are you sure you want to delete this address?');
+      if(dblCheck) {
+        this.authService.deleteAddress(addressId)
+        .subscribe((res) => {
+          control.removeAt(rowIndex);
+          console.log(res);
+        },
+        (err) => {
+          console.log(err);
+          return false;
+        });
+      } else {
         return false;
-      });
+      }
+    } else {
+      control.removeAt(rowIndex);
+    }
+
   }
 
   onUpdatePassword(form: NgForm) {

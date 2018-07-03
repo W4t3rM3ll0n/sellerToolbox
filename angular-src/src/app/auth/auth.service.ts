@@ -81,13 +81,13 @@ export class AuthService {
       )
   }
 
-  deleteAddress() {
+  deleteAddress(addressId: string) {
     let headers = new Headers();
     this.loadToken();
     headers.append('Authorization', this.jwtToken);
     headers.append('Content-Type', 'application/json');
     this.jwtToken = null;
-    return this.http.post('http://localhost:3000/users/deleteAddress', { addresses: 'address' }, { headers: headers })
+    return this.http.post('http://localhost:3000/users/deleteAddress', { addressId: addressId }, { headers: headers })
       .pipe(
         map(res => res.json())
       )

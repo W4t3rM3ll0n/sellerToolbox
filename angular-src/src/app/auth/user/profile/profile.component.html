@@ -87,14 +87,14 @@
                     formControlName="zip">
               </td>
               <td class="align-middle">
-                  <input 
+                  <input
                     type="radio"
                     class="form-control"
                     name="primary"
-                    [value]="true"
+                    value="checked"
+                    [checked]="user.addresses[i]?.primary"
                     formControlName="primary">
               </td>
-              
               <ng-template [ngIf]="addUpdateAddressForm.controls.addresses.controls.length > 1">
                 <td (click)="removeAddressRow(i)" class="align-middle" style="cursor: pointer;">&times;</td>
               </ng-template>

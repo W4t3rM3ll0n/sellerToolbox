@@ -62,6 +62,7 @@ module.exports = {
                         barcode: product.barcode,
                         images: product.images,
                         condition: product.condition,
+                        location: product.location,
                         detail: {
                             weight: product.detail.weight,
                             height: product.detail.height,

@@ -61,6 +61,7 @@ module.exports = {
                     reject();
                 } else {
                     address.map((item) => {
+                        item.fullAddress = `${item.address1} ${item.address2} ${item.city}, ${item.state} ${item.zip}`;
                         if(item._id === '') {
                             newList.push(item);
                         } else {

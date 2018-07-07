@@ -36,6 +36,8 @@ router.put('/createProducts', passport.authenticate('jwt', { session:false }), (
 router.post('/updateProducts', passport.authenticate('jwt', { session:false }), (req, res, next) => {
     
     const products = req.body.products;
+    // console.log(products);
+    
     // userId is just used for double verification.
     const userId = req.user._id;
     // console.log(products);

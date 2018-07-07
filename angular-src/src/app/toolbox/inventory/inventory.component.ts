@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgForm, FormGroup, Validators, FormBuilder, FormArray } from '@angular/forms';
 
 import { ToolboxService } from '../toolbox.service';
+import { AuthService } from '../../auth/auth.service';
 import { ProductGroupRow, InventoryGroupRow } from '../../shared/general.models';
 
 @Component({
@@ -16,12 +17,24 @@ export class InventoryComponent implements OnInit, OnDestroy {
   selectedRows: Array<ProductGroupRow> = [];
   tag: NodeListOf<Element> | Array<HTMLTableElement> = document.getElementsByTagName('tr');
 
+  // User
+  user: object; // Change the type later.
+
   constructor(
     private toolboxService: ToolboxService,
-    private _fb: FormBuilder
+    private _fb: FormBuilder,
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
+    // Get the user information for address.
+    this.authService.getProfile()
+      .subscribe(
+        (user) => {
+          // console.log(user);
+          this.user = user;
+        }
+      )
     // Getting the products from the database.
     this.toolboxService.getProducts()
       .subscribe(
@@ -41,7 +54,6 @@ export class InventoryComponent implements OnInit, OnDestroy {
     const control = <FormArray>this.updateProductsForm.controls['products'];
     // Initialize product rows with the items/data from the database.
     this.inventory.forEach((item) => {
-      // console.log(item);
       const data = this._fb.group({
         'id': [{value: item._id, disabled: true}],
         'images': [{value: item.images, disabled: true}],

@@ -24,7 +24,7 @@ export class ProfileComponent implements OnInit {
     this.authService.getProfile()
       .subscribe(profile => {
         this.user = profile;
-        console.log(this.user);
+        // console.log(this.user);
         return this.user;
       },
       err => {
@@ -62,6 +62,8 @@ export class ProfileComponent implements OnInit {
   blankFormRow() {
     const data = this._fb.group({
       'id': [''],
+      'fullAddress': [''],
+      'name': [''],
       'address1': ['', Validators.required],
       'address2': ['', Validators.required],
       'city': ['', Validators.required],
@@ -83,6 +85,8 @@ export class ProfileComponent implements OnInit {
           profile.addresses.forEach((address) => {
             const dataValues: any = { // Change this type later.
               'id': [address._id],
+              'fullAddress': [address.fullAddress],
+              'name': [address.name],
               'address1': [address.address1],
               'address2': [address.address2],
               'city': [address.city],
@@ -90,7 +94,7 @@ export class ProfileComponent implements OnInit {
               'zip': [address.zip],
               'primary': [address.primary]
             }
-            
+
             const data = this._fb.group(dataValues);
             control.push(data);
           });
@@ -114,18 +118,18 @@ export class ProfileComponent implements OnInit {
 
   onAddUpdateAddress() { // This method still has bugs 07/02/18. Use the work around for now.
     const address = this.addUpdateAddressForm.value.addresses;
-
-    address.forEach((row) => {
-      // console.log(row.primary);
-      row.primary === 'checked' ? row.primary = true : row.primary = false;
-      
-    });
+    // console.log(address);
+    const radios = document.getElementsByClassName('radios');
+    for(let i = 0; i < radios.length; i++) {
+      radios[i]['checked'] ? address[i].primary = true : address[i].primary = false;
+    }
 
     // console.log(address);
 
     this.authService.addUpdateAddress(address)
       .subscribe((res) => {
-        console.log(res);
+        // console.log(res);
+        this.ngOnInit();
       });
 
   }

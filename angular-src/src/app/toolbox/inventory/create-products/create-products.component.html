@@ -111,11 +111,10 @@
                 formControlName="condition"
                 class="form-control-sm">
             </td>
-            <td>
-              <input
-                type="text"
-                formControlName="location"
-                class="form-control-sm">
+            <td class="align-middle" *ngIf="user">
+              <select class="form-control-sm" formControlName="location">
+                <option *ngFor="let address of user.addresses" [ngValue]="address.fullAddress">{{ address.fullAddress }}</option>
+              </select>
             </td>
             <td formGroupName="detail">
               <input

@@ -59,7 +59,7 @@
               formControlName="id">
             <td class="align-middle">
               <div class="outer-thumbnail-img" *ngIf="inventory">
-                <img src="{{inventory[i].images}}" alt="placeholder" class="img-thumbnail d-block mx-auto">
+                <img src="{{product.value.images}}" alt="placeholder" class="img-thumbnail d-block mx-auto">
               </div>
             </td>
             <td class="align-middle" *ngIf="editModeOff === false">
@@ -159,10 +159,9 @@
                 formControlName="condition">
             </td>
             <td class="align-middle">
-              <input 
-                type="text"
-                class="form-control-sm"
-                formControlName="location">
+              <select class="form-control-sm" formControlName="location">
+                <option *ngFor="let address of user.addresses" [ngValue]="address.fullAddress">{{ address.fullAddress }}</option>
+              </select>
             </td>
             <td class="align-middle" formGroupName="detail">
               <input 

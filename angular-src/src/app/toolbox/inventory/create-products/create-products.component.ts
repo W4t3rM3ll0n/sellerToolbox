@@ -3,6 +3,7 @@ import { FormGroup, Validators, FormArray, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { ToolboxService } from '../../toolbox.service';
+import { AuthService } from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-create-products',
@@ -11,14 +12,21 @@ import { ToolboxService } from '../../toolbox.service';
 })
 export class CreateProductsComponent implements OnInit {
   createProductsForm: FormGroup;
+  user: object;
 
   constructor(
     private _fb: FormBuilder,
     private toolboxService: ToolboxService,
+    private authService: AuthService,
     private router: Router
   ) { }
 
   ngOnInit() {
+    this.authService.getProfile()
+      .subscribe((user) => {
+        this.user = user;
+        console.log(this.user);
+      })
     // Initialize the form
     this.createProductsForm = this._fb.group({
       'products': this._fb.array([

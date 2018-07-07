@@ -24,6 +24,7 @@ const usersSchema = new Schema({
     },
     addresses: {
         type: [{
+            name: String,
             address1: {
                 type: String,
                 required: true
@@ -41,7 +42,8 @@ const usersSchema = new Schema({
                 type: String,
                 required: true
             },
-            primary: Boolean
+            primary: Boolean,
+            fullAddress: String
         }]
     },
     ebayauthtoken: {

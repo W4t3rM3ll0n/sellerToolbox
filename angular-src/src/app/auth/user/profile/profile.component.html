@@ -38,6 +38,7 @@
           <thead>
             <tr class="table-success">
               <th scope="col"></th>
+              <th scope="col">Name</th>
               <th scope="col">Address 1</th>
               <th scope="col">Address 2</th>
               <th scope="col">City</th>
@@ -55,7 +56,17 @@
                 type="hidden"
                 class="form-control"
                 formControlName="id">
+              <input 
+                type="hidden"
+                class="form-control"
+                formControlName="fullAddress">
 
+              <td class="align-middle">
+                  <input 
+                    type="text"
+                    class="form-control"
+                    formControlName="name">
+              </td>
               <td class="align-middle">
                   <input 
                     type="text"
@@ -89,9 +100,8 @@
               <td class="align-middle">
                   <input
                     type="radio"
-                    class="form-control"
+                    class="radios form-control"
                     name="primary"
-                    value="checked"
                     [checked]="user.addresses[i]?.primary"
                     formControlName="primary">
               </td>

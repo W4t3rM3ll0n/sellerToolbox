@@ -8,13 +8,20 @@
     <hr>
     <form (ngSubmit)="updateEbaySettings(f)" #f="ngForm">
       <div class="form-group">
-        <label for="placeholder">Placeholder</label>
+        <label for="tokens">Auth Token</label>
         <input 
           type="text" 
-          name="placeholder"
-          ngModel="PlaceHolder"
-          class="form-control"
-        >
+          name="authTokens"
+          ngModel={{eTokens?.authToken}}
+          class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="tokens">Refresh Token</label>
+        <input 
+          type="text" 
+          name="refTokens"
+          ngModel={{eTokens?.refToken}}
+          class="form-control">
       </div>
       <button 
         class="btn btn-primary" 

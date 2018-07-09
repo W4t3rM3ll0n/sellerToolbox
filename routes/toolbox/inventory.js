@@ -24,7 +24,7 @@ router.put('/createProducts', passport.authenticate('jwt', { session:false }), (
     } else {
         products[0]['userId'] = req.user._id
     }
-    console.log(products);
+    // console.log(products);
     
     configInventory.addProducts(products, (err, response) => {
         err ? res.json(err) : res.json(response);

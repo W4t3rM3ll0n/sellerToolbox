@@ -23,6 +23,7 @@ import { InventoryComponent } from './toolbox/inventory/inventory.component';
 import { CreateProductsComponent } from './toolbox/inventory/create-products/create-products.component';
 import { ToDoComponent } from './toolbox/to-do/to-do.component';
 import { AnalyticsComponent } from './toolbox/analytics/analytics.component';
+import { OrdersComponent } from './toolbox/orders/orders.component';
 
 const appRoutes: Routes = [
     {path: '', component: HomeComponent},
@@ -31,6 +32,7 @@ const appRoutes: Routes = [
         { path: 'dashboard', component: DashboardComponent },
         { path: 'inventory', component: InventoryComponent },
         { path: 'createProducts', component: CreateProductsComponent },
+        { path: 'orders', component: OrdersComponent },
         { path: 'toDo', component: ToDoComponent },
         { path: 'analytics', component: AnalyticsComponent },
     ]},

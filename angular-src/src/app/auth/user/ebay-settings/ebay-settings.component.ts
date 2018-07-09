@@ -10,7 +10,7 @@ import { EbayService } from '../../../ebay/ebay.service';
   styleUrls: ['./ebay-settings.component.css']
 })
 export class EbaySettingsComponent implements OnInit, OnDestroy {
-  eToken: object;
+  eTokens: object;
   policies: object;
   subscription: Subscription;
 
@@ -27,6 +27,11 @@ export class EbaySettingsComponent implements OnInit, OnDestroy {
         console.log(err);
         return false;
       });
+    this.ebayService.getEbayTokens()
+      .subscribe((eTokens) => {
+        console.log(eTokens);
+        this.eTokens = eTokens;
+      })
   }
 
   // Opt into Selling Policy Management (SPM)

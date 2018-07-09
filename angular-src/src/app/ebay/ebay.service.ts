@@ -20,6 +20,18 @@ export class EbayService {
     this.jwtToken = token;
   }
 
+  getEbayTokens() {
+    let headers = new Headers();
+    this.loadToken();
+    headers.append('Authorization', this.jwtToken);
+    headers.append('Content-Type', 'application/json');
+    this.jwtToken = null;
+    return this.http.get('https://localhost:3000/ebay/tokens', { headers: headers })
+      .pipe(
+        map(eTokens => eTokens.json())
+      )
+  }
+
   // Getting Auth and Refresh Token -- Typically for new accounts
   getAuthRefTokens(code) {
     let headers = new Headers();

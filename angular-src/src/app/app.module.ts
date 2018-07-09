@@ -32,6 +32,7 @@ import { ToolboxComponent } from './toolbox/toolbox.component';
 import { CreateProductsComponent } from './toolbox/inventory/create-products/create-products.component';
 import { ToDoComponent } from './toolbox/to-do/to-do.component';
 import { AnalyticsComponent } from './toolbox/analytics/analytics.component';
+import { OrdersComponent } from './toolbox/orders/orders.component';
 
 @NgModule({
   declarations: [
@@ -58,7 +59,8 @@ import { AnalyticsComponent } from './toolbox/analytics/analytics.component';
     ToolboxComponent,
     CreateProductsComponent,
     ToDoComponent,
-    AnalyticsComponent
+    AnalyticsComponent,
+    OrdersComponent
   ],
   imports: [
     BrowserModule,

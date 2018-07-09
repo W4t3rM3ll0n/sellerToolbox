@@ -25,7 +25,7 @@ export class CreateProductsComponent implements OnInit {
     this.authService.getProfile()
       .subscribe((user) => {
         this.user = user;
-        console.log(this.user);
+        // console.log(this.user);
       })
     // Initialize the form
     this.createProductsForm = this._fb.group({

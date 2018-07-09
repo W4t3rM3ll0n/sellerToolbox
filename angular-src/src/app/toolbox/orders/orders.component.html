@@ -1,0 +1,120 @@
+<h2>Orders</h2>
+<hr>
+<!-- Search Form -->
+<form class="form-inline" (ngSubmit)="onSearchOrders(s)" #s="ngForm">
+    <input 
+      class="form-control mr-sm-2"
+      type="text"
+      name="search"
+      ngModel
+      placeholder="Search">
+    <button class="btn btn-secondary" type="submit">Search</button>
+</form>
+<hr>
+
+<div class="form-inline">
+  <button type="button" class="btn btn-outline-warning mr-sm-2" routerLink="/toolbox/createProducts">Create</button>
+  <button type="button" class="btn btn-outline-warning mr-sm-2" (click)="onEditOrders()" *ngIf="editModeOff === true">Edit</button>
+  <button type="button" class="btn btn-outline-warning mr-sm-2" (click)="onEditOrders()" *ngIf="editModeOff === false">&times;</button>
+  <button type="button" class="btn btn-outline-danger mr-sm-2" (click)="onDeleteMultiOrders()" *ngIf="editModeOff === false">Delete</button>
+  <select class="custom-select" (change)="onSelectOrderFilter($event)">
+    <option value="open">Open Orders</option>
+    <option value="completed">Completed Orders</option>
+    <option value="pending">Pending Orders</option>
+  </select>
+</div>
+
+<hr>
+<!-- Orders Form -->
+<div id="scrollStyle" class="horizontal-scroll">
+  <form *ngIf="ordersForm" [formGroup]="ordersForm" (ngSubmit)="onSubmitOrders()">
+    <table formArrayName="orders" class="table table-hover cell-border">
+      <thead>
+        <tr class="table-success">
+          <th scope="col"></th>
+          <th scope="col">Order #</th>
+          <th scope="col">Product Image</th>
+          <th scope="col">Order Item</th>
+          <th scope="col">Order Qty</th>
+          <th scope="col">Order Total</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody *ngFor="let product of ordersForm.controls.orders.controls; let i=index;">
+        <tr class="cell-border" [formGroupName]="i" (click)="onSelectItem(i)">
+          <td class="align-middle">{{i + 1}}</td>
+
+          <!-- View Mode -->
+          <ng-template [ngIf]="editModeOff === true">
+            <td class="align-middle">
+              <span class="h5">15262</span>
+            </td>
+            <td class="align-middle">
+                <div class="outer-thumbnail-img">
+                  <img 
+                    src="https://cdn.eglobalcentral.eu/images/magictoolbox_cache/8c95d73fec130487c102a73bf1ab42ce/2/3/23130/thumb360x360/4017305370/samsung-galaxy-s9-plus-g9650-dual-sim-4g-f0lklq.jpg" 
+                    class="img-thumbnail" 
+                    alt="">
+                </div>
+            </td>
+            <td class="align-middle">
+              <span class="p">Samsung Galaxy S9 Black Cell Phone - 64GB</span>
+            </td>
+            <td class="align-middle">
+              <span class="h3">2</span>
+            </td>
+            <td class="align-middle">
+              <span class="h5">$99.99</span>
+            </td>
+          </ng-template>
+
+          <!-- Edit Mode -->
+          <ng-template [ngIf]="editModeOff === false">
+            <td class="align-middle">
+              <input
+                type="text"
+                class="form-control-sm"
+                formControlName="orderNumber">
+            </td>
+            <td class="align-middle">
+              <input
+                type="text"
+                class="form-control-sm"
+                formControlName="productImage">
+            </td>
+            <td class="align-middle">
+              <input
+                type="text"
+                class="form-control-sm"
+                formControlName="orderItem">
+            </td>
+            <td class="align-middle">
+              <input
+                type="text"
+                class="form-control-sm"
+                formControlName="orderQty">
+            </td>
+            <td class="align-middle">
+              <input
+                type="text"
+                class="form-control-sm"
+                formControlName="orderTotal">
+            </td>
+          </ng-template>
+          
+          <ng-template [ngIf]="ordersForm.controls.orders.controls.length > 0">
+            <td (click)="onDeleteSingleItems(i)" class="align-middle" style="cursor: pointer;">&times;</td>
+          </ng-template>
+
+          <!-- <ng-template>
+            <td class="align-middle"></td>
+          </ng-template> -->
+
+        </tr>
+      </tbody>
+    </table>
+    <button (click)="addNewOrderRow()" class="btn btn-warning mr-sm-2" type="button">Quick Add</button>
+    <button type="submit" class="btn btn-outline-success mr-sm-2">Submit</button>
+    <br><br>
+  </form>
+</div>

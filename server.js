@@ -34,10 +34,12 @@ configPassport.jwtStrat(passport);
 // Setting and Handling Routes
 const users = require('./routes/users');
 const inventory = require('./routes/toolbox/inventory');
+const orders = require('./routes/toolbox/orders');
 const ebay = require('./routes/ebay');
 
 app.use('/users', users);
 app.use('/toolbox/inventory', inventory);
+app.use('/toolbox/orders', orders);
 app.use('/ebay', ebay);
 
 app.get('/', (req, res) => {

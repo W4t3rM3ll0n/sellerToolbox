@@ -12,6 +12,14 @@ router.get('/', (req, res, next) => {
     res.send('/ebay');
 });
 
+// Ebay Tokens To Client
+router.get('/tokens', passport.authenticate('jwt', { session:false }), (req, res, next) => {
+    res.json({
+        authToken: req.user.ebayauthtoken,
+        refToken: req.user.ebayreftoken
+    });
+});
+
 // Accept HTML
 router.post('/accept', passport.authenticate('jwt', { session:false }), (req, res, next) => {
 

@@ -24,6 +24,8 @@ import { CreateProductsComponent } from './toolbox/inventory/create-products/cre
 import { ToDoComponent } from './toolbox/to-do/to-do.component';
 import { AnalyticsComponent } from './toolbox/analytics/analytics.component';
 import { OrdersComponent } from './toolbox/orders/orders.component';
+import { WoocommerceSettingsComponent } from './auth/user/woocommerce-settings/woocommerce-settings.component';
+import { WoocommerceComponent } from './toolbox/marketplaces/woocommerce/woocommerce.component';
 
 const appRoutes: Routes = [
     {path: '', component: HomeComponent},
@@ -35,6 +37,7 @@ const appRoutes: Routes = [
         { path: 'orders', component: OrdersComponent },
         { path: 'toDo', component: ToDoComponent },
         { path: 'analytics', component: AnalyticsComponent },
+        { path: 'woocommerce', component: WoocommerceComponent },
     ]},
     // Routes for ebay.
     { path: 'ebay', component: EbayComponent, canActivate: [AuthGuard] },
@@ -54,6 +57,7 @@ const appRoutes: Routes = [
         { path: '', redirectTo: '/user/profile', pathMatch: 'full' },
         { path: 'profile', component: ProfileComponent },
         { path: 'ebay', component: EbaySettingsComponent },
+        { path: 'woocommerce', component: WoocommerceSettingsComponent },
     ]},
 ];
 

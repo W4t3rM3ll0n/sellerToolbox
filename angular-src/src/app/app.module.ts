@@ -33,6 +33,8 @@ import { CreateProductsComponent } from './toolbox/inventory/create-products/cre
 import { ToDoComponent } from './toolbox/to-do/to-do.component';
 import { AnalyticsComponent } from './toolbox/analytics/analytics.component';
 import { OrdersComponent } from './toolbox/orders/orders.component';
+import { WoocommerceSettingsComponent } from './auth/user/woocommerce-settings/woocommerce-settings.component';
+import { WoocommerceComponent } from './toolbox/marketplaces/woocommerce/woocommerce.component';
 
 @NgModule({
   declarations: [
@@ -60,7 +62,9 @@ import { OrdersComponent } from './toolbox/orders/orders.component';
     CreateProductsComponent,
     ToDoComponent,
     AnalyticsComponent,
-    OrdersComponent
+    OrdersComponent,
+    WoocommerceSettingsComponent,
+    WoocommerceComponent
   ],
   imports: [
     BrowserModule,

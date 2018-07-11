@@ -36,11 +36,13 @@ const users = require('./routes/users');
 const inventory = require('./routes/toolbox/inventory');
 const orders = require('./routes/toolbox/orders');
 const ebay = require('./routes/ebay');
+const woocommerce = require('./routes/marketPlaces/woocommerce');
 
 app.use('/users', users);
 app.use('/toolbox/inventory', inventory);
 app.use('/toolbox/orders', orders);
 app.use('/ebay', ebay);
+app.use('/woocommerce', woocommerce);
 
 app.get('/', (req, res) => {
     res.send('Invalid Endpoint');

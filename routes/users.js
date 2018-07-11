@@ -20,9 +20,8 @@ const jwt = require('jsonwebtoken');
 
 // Root /users
 router.get('/', (req, res, next) => {
-    configUsers.getUserById()
+    configUsers.getUserById();
     res.send('Nothing to see here');
-    
 });
 
 // /users/register GET

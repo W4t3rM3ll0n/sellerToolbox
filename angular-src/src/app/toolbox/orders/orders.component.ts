@@ -28,7 +28,7 @@ export class OrdersComponent implements OnInit {
   }
 
   initForm() {
-    // Initialize a product row
+    // Initialize order rows
     return this._fb.group({
       'orderNumber': ['', Validators.required],
       'productImage': ['', Validators.required],
@@ -39,6 +39,7 @@ export class OrdersComponent implements OnInit {
   }
 
   newOrderRow() {
+    // Initialize a blank order row
     return this._fb.group({
       'orderNumber': ['', Validators.required],
       'productImage': ['', Validators.required],

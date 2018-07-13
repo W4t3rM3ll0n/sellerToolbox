@@ -76,13 +76,37 @@ export class ToolboxService {
             )
     }
 
-    getWooOrders() {
+    getAllOrders() {
         let headers = new Headers();
         this.loadToken();
         headers.append('Authorization', this.jwtToken);
         headers.append('Content-Type', 'application/json');
         this.jwtToken = null;
-        return this.http.get('http://localhost:3000/woocommerce/getOrders', { headers: headers })
+        return this.http.get('http://localhost:3000/woocommerce/getAllOrders', { headers: headers })
+            .pipe(
+                map(wooOrders => wooOrders.json())
+            )
+    }
+
+    getWooOrdersByStatus(status) {
+        let headers = new Headers();
+        this.loadToken();
+        headers.append('Authorization', this.jwtToken);
+        headers.append('Content-Type', 'application/json');
+        this.jwtToken = null;
+        return this.http.post('http://localhost:3000/woocommerce/getOrdersByStatus', { status: status }, { headers: headers })
+            .pipe(
+                map(wooOrders => wooOrders.json())
+            )
+    }
+
+    updateWooOrders(orders, opt) {
+        let headers = new Headers();
+        this.loadToken();
+        headers.append('Authorization', this.jwtToken);
+        headers.append('Content-Type', 'application/json');
+        this.jwtToken = null;
+        return this.http.post('http://localhost:3000/woocommerce/updateWooOrders', { orders: orders, options: opt }, { headers: headers })
             .pipe(
                 map(wooOrders => wooOrders.json())
             )

@@ -36,10 +36,36 @@ module.exports = {
         return redirectUrl;
     },
 
-    // Initiate the oAuth function then call the HTTP request to Woocommerce's end points.
-    getOrders(callback) {
+    // Get All Orders
+    getAllOrders(callback) {
         const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2');
         Woocommerce.get('orders', (err, data, res) => {
+            err ? callback(err, null) : callback(null, res);
+        });
+    },
+
+    // Initiate the oAuth function then call the HTTP request to Woocommerce's end points.
+    getOrdersByStatus(status, callback) {
+        const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2');
+        Woocommerce.get('orders?status='+status, (err, data, res) => {
+            err ? callback(err, null) : callback(null, res);
+        });
+    },
+
+    updateOrders(orders, options, callback) {
+        const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2');
+        const data = {
+            update: [],
+        };
+        orders.forEach((order) => {
+            data.update.push({
+                    id: order.number,
+                    status: options
+                });
+        });
+        // console.log(data);
+
+        Woocommerce.put('orders/batch', data, (err, data, res) => {
             err ? callback(err, null) : callback(null, res);
         });
     },

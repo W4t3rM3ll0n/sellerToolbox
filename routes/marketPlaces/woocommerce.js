@@ -17,10 +17,27 @@ router.get('/getKeys', (req, res) => { // Currently we can not get the keys prog
     res.redirect(redirectUrl);
 });
 
-// Get Orders
-router.get('/getOrders', passport.authenticate('jwt', { session:false }), (req, res) => {
-    configWoocommerce.getOrders((err, result) => {
-        err ? res.json({err: err}) : res.json(JSON.parse(result));
+// Get All Orders
+router.get('/getAllOrders', passport.authenticate('jwt', { session:false }), (req, res) => {
+    configWoocommerce.getAllOrders((err, orders) => {
+        err ? res.json({err: err}) : res.json(JSON.parse(orders));
+    });
+});
+
+// Get Orders By Status
+router.post('/getOrdersByStatus', passport.authenticate('jwt', { session:false }), (req, res) => {
+    const status = req.body.status;
+    configWoocommerce.getOrdersByStatus(status, (err, orders) => {
+        err ? res.json({err: err}) : res.json(JSON.parse(orders));
+    });
+});
+
+// Update Orders
+router.post('/updateWooOrders', passport.authenticate('jwt', { session:false }), (req, res) => {
+    const orders = req.body.orders;
+    const options = req.body.options;
+    configWoocommerce.updateOrders(orders, options, (err, updated) => {
+        err ? res.json({err: err}) : res.json(JSON.parse(updated));
     });
 });
 

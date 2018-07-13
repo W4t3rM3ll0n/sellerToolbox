@@ -14,6 +14,8 @@ export class OrdersComponent implements OnInit {
   wooOrders: object[];
   selectedOrders: object[] = [];
   tag: NodeListOf<Element> | Array<HTMLTableElement> = document.getElementsByTagName('tr');
+  orderFilter: string = 'processing';
+  isOpen = false;
 
   constructor(
     private toolBox: ToolboxService,
@@ -21,14 +23,13 @@ export class OrdersComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.toolBox.getWooOrders()
+    this.toolBox.getWooOrdersByStatus(this.orderFilter)
       .subscribe((orders) => {
         this.wooOrders = orders;
         // console.log(this.wooOrders);
       },
       err => {
         console.log(err);
-        return false;
       });
   }
 
@@ -66,8 +67,26 @@ export class OrdersComponent implements OnInit {
 
   onDeleteMultiOrders() {}
 
-  onSelectOrderFilter(e) {
-    console.log(e.target.value);
+  onSelectOrderFilter(e?) {
+    this.resetToDefault();
+    this.orderFilter = e.target.value;
+    if(this.orderFilter === 'all') {
+      this.toolBox.getAllOrders()
+        .subscribe((orders) => {
+          this.wooOrders = orders;
+        },
+        err => {
+          console.log(err);
+        });
+    } else {
+      this.toolBox.getWooOrdersByStatus(this.orderFilter)
+      .subscribe((orders) => {
+        this.wooOrders = orders;
+      },
+      err => {
+        console.log(err);
+      });
+    }
   }
 
   onPrintOrder() {
@@ -75,6 +94,37 @@ export class OrdersComponent implements OnInit {
     this.selectedOrders.forEach((order) => {
       console.log(order);
     });
+  }
+
+  openDropdown() {
+    this.isOpen = !this.isOpen;
+
+    if(this.isOpen === true) {
+      document.getElementById('dropdownToggle').className += ' show';
+    } else {
+      document.getElementById('dropdownToggle').className = 'dropdown-menu';
+    }
+  }
+
+  onUpdateWooOrders(options?) {
+    if(this.selectedOrders.length > 0) {
+      this.toolBox.updateWooOrders(this.selectedOrders, options)
+        .subscribe((updated) => {
+          console.log(updated);
+        },
+        err => {
+          console.log(err);
+        });
+    }
+  }
+
+  resetToDefault() {
+    this.editModeOff = true;
+    this.selectedOrders = [];
+    for(let i = 0; i < this.tag.length; i++) {
+      this.tag[i].setAttribute('style', '');
+      this.tag[i]['selected'] = 'no';
+    }
   }
 
 }

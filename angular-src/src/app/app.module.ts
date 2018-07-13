@@ -35,6 +35,7 @@ import { AnalyticsComponent } from './toolbox/analytics/analytics.component';
 import { OrdersComponent } from './toolbox/orders/orders.component';
 import { WoocommerceSettingsComponent } from './auth/user/woocommerce-settings/woocommerce-settings.component';
 import { WoocommerceComponent } from './toolbox/marketplaces/woocommerce/woocommerce.component';
+import { MarketplaceService } from './toolbox/marketplaces/marketplace.service';
 
 @NgModule({
   declarations: [
@@ -73,7 +74,7 @@ import { WoocommerceComponent } from './toolbox/marketplaces/woocommerce/woocomm
     AppRoutingModule,
     ReactiveFormsModule
   ],
-  providers: [ServerService, AuthService, AuthGuard, EbayService],
+  providers: [ServerService, AuthService, AuthGuard, EbayService, MarketplaceService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

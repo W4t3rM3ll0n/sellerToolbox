@@ -3,15 +3,12 @@
 const express = require('express');
 const router = express.Router();
 
-const mongoose = require('mongoose');
 
-const Users = require('../models/users');
 const configDB = require('../config/database');
 const configUsers = require('../config/users');
 
 // Login/Register Setup
 const passport = require('passport');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 /************************************/

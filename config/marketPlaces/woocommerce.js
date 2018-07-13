@@ -1,20 +1,21 @@
 'use strict'
 
 const querystring = require('querystring');
-const wooApi = require('woocommerce-api');
-
-const configHttp = require('../httpReq');
+const WooAPI = require('woocommerce-api');
 
 require('dotenv').config();
 
-// Http Auth
-const Woocommerce = new wooApi({
-    url: 'https://publifiedlabs.com/apiTest',
-    consumerKey: process.env.WOO_KEY,
-    consumerSecret: process.env.WOO_SECRET,
-    wpAPI: true,
-    version: 'wc/v2'
-});
+// OAuth Function when calling to Woocomerce API
+function oAuth(url, version) {
+    return new WooAPI({
+        url: url,
+        consumerKey: process.env.WOO_KEY,
+        consumerSecret: process.env.WOO_SECRET,
+        wpAPI: true,
+        version: version,
+        // queryStringAuth: true // Force Basic Authentication as query string true and using under HTTPS
+    });
+}
 
 module.exports = {
 
@@ -35,9 +36,11 @@ module.exports = {
         return redirectUrl;
     },
 
-    getOrders() {
-        Woocommerce.get('', (err, data, res) => {
-            console.log(res);
+    // Initiate the oAuth function then call the HTTP request to Woocommerce's end points.
+    getOrders(callback) {
+        const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2');
+        Woocommerce.get('orders', (err, data, res) => {
+            err ? callback(err, null) : callback(null, res);
         });
     },
 

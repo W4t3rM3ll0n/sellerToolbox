@@ -77,7 +77,7 @@ export class CreateProductsComponent implements OnInit {
 
     this.toolboxService.createItems(productsDetail)
       .subscribe((res) => {
-        console.log(res);
+        // console.log(res);
         this.router.navigate(['/toolbox/inventory']);
       },
       (err) => {

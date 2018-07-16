@@ -1,32 +1,12 @@
-.btn {
-    border-color: rgba(255, 255, 0, 0.6);
+td {
+    max-width: 350px;
+    overflow: auto;
+    text-overflow: nowrap;
+    white-space: pre;
 }
 
-.cell-border {
-    border: rgba(255, 255, 255) 1px solid;
-}
-
-.img-thumbnail {
-    max-width: 65px;
-    max-height: 65px;
-    border: none;
-}
-
-.outer-thumbnail-img {
-    border: 1px solid #dee2e6;
-    border-radius: 0.25rem;
-    max-width: 70px;
-    max-height: 70px;
-}
-
-/* Scrollbar styling */
-#scrollStyle::-webkit-scrollbar {
-    background-color: #f5f5f5;
-}
-#scrollStyle::-webkit-scrollbar-thumb {
-    background-color: #111;
-}
-
-.horizontal-scroll {
-    overflow-x: auto;
+td::-webkit-scrollbar {
+    width: 0px;  /* remove scrollbar space */
+    height: 0px;
+    background: transparent;  /* optional: just make scrollbar invisible */
 }

@@ -37,6 +37,7 @@ module.exports = {
 
         // Update each product from the entire list. Push each product into the 'updated' array and pass it to the callback when we init the promise.
         // Currenty it updates even if there was no edit. Fix it so that it will only update items that have been edited.
+        // Also shrink this code by formatting the Object on the client side.
         const updateProducts = () => {
             return new Promise((resolve, reject) => {
                 productsQuery.forEach((product) => {
@@ -49,7 +50,7 @@ module.exports = {
                             availableQuantity: product.quantity.quantity - product.quantity.pendingOrders,
                             alertQuantity: product.quantity.alertQuantity,
                             pendingOrders: product.quantity.pendingOrders,
-                            neededQuantity: product.quantity.alertQuantity - product.quantity.availableQuantity
+                            neededQuantity: product.quantity.alertQuantity - product.quantity.availableQuantity > 0 ? product.quantity.alertQuantity - product.quantity.availableQuantity : 0
                         },
                         description: product.description,
                         price: {
@@ -136,6 +137,35 @@ module.exports = {
             });
         }
 
+    },
+
+    linkItems(toolboxItem, marketplaceItem, userId, callback) {
+        // Currently only works for Woo items. Adjust later for all marketplaces when integrating their apis
+        Products.findOne({_id: toolboxItem._id, userId: userId}).exec()
+            .then((item) => {
+                // item.linked.woocommerce = [];
+                // item.save();
+                if(item.linked.woocommerce.length > 0) {
+                    const index = item.linked.woocommerce.map(each => { return each.id }).indexOf(marketplaceItem.id);
+                    if(index > -1) {
+                        throw 'This item is already linked.';
+                    } else {
+                        // item.linked.woocommerce = [];
+                        item.linked.woocommerce.push(marketplaceItem);
+                        item.save((err, linked) => {
+                            err ? callback(err, null) : callback(null, linked);
+                        });
+                    }
+                } else {
+                    item.linked.woocommerce.push(marketplaceItem);
+                    item.save((err, linked) => {
+                        err ? callback(err, null) : callback(null, linked);
+                    });
+                }
+            })
+        .catch((err) => {
+            callback(err, null);
+        })
     },
 
 }

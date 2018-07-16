@@ -26,7 +26,7 @@ export class OrdersComponent implements OnInit {
     this.toolBox.getWooOrdersByStatus(this.orderFilter)
       .subscribe((orders) => {
         this.wooOrders = orders;
-        // console.log(this.wooOrders);
+        console.log(this.wooOrders);
       },
       err => {
         console.log(err);
@@ -60,18 +60,51 @@ export class OrdersComponent implements OnInit {
   }
 
   onDeleteSingleItems(i: number) {
-    // Splice the item in the array at its index once.
-    this.wooOrders.splice(i, 1);
-    // Reach out to Woo API and trash the order.
+    const dblCheck = confirm('Are you sure you want to delete this order?');
+
+    if(dblCheck) {
+      // Reach out to Woo API and trash the order.
+      this.toolBox.updateWooOrders([], { delete: [this.wooOrders[i]['id']] })
+        .subscribe((deleted) => {
+          console.log(deleted);
+          // Splice the item in the array at its index once.
+          this.wooOrders.splice(i, 1);
+        },
+        err => {
+          console.log(err);
+        });
+    } else {
+      return false;
+    }
   }
 
-  onDeleteMultiOrders() {}
+  onDeleteMultiOrders() {
+    // console.log(this.selectedOrders);
+    this.toolBox.updateWooOrders(this.selectedOrders, { delete: [] })
+      .subscribe((deleted) => {
+        console.log(deleted);
+      },
+      err => {
+        console.log(err);
+      });
+    
+    // Increment backwards to remove the selected rows
+    for(let i = this.wooOrders.length - 1; i >= 0; i--) {
+      for(let j = this.selectedOrders.length - 1; j >= 0; j--) {
+        if(this.wooOrders[i] === this.selectedOrders[j]) {
+          const index = this.wooOrders.indexOf(this.selectedOrders[j]);
+          // console.log(index);
+          this.wooOrders.splice(index, 1);
+        }
+      }
+    }
+  }
 
   onSelectOrderFilter(e?) {
     this.resetToDefault();
     this.orderFilter = e.target.value;
     if(this.orderFilter === 'all') {
-      this.toolBox.getAllOrders()
+      this.toolBox.getAllWooOrders()
         .subscribe((orders) => {
           this.wooOrders = orders;
         },
@@ -108,7 +141,7 @@ export class OrdersComponent implements OnInit {
 
   onUpdateWooOrders(options?) {
     if(this.selectedOrders.length > 0) {
-      this.toolBox.updateWooOrders(this.selectedOrders, options)
+      this.toolBox.updateWooOrders(this.selectedOrders, { update: [] }, options)
         .subscribe((updated) => {
           console.log(updated);
         },

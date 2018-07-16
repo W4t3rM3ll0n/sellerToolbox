@@ -9,12 +9,12 @@ const passport = require('passport');
 const configInventory = require('../../config/toolbox/inventory');
 
 // Main Page
-router.get('/', (req, res, next) => {
+router.get('/', (req, res) => {
     res.send('hello there from inventory');
 });
 
 // Create Products
-router.put('/createProducts', passport.authenticate('jwt', { session:false }), (req, res, next) => {
+router.put('/createProducts', passport.authenticate('jwt', { session:false }), (req, res) => {
 
     const products = req.body.products;
     if(products.length > 1) {
@@ -33,7 +33,7 @@ router.put('/createProducts', passport.authenticate('jwt', { session:false }), (
 });
 
 // Update Products
-router.post('/updateProducts', passport.authenticate('jwt', { session:false }), (req, res, next) => {
+router.post('/updateProducts', passport.authenticate('jwt', { session:false }), (req, res) => {
     
     const products = req.body.products;
     // console.log(products);
@@ -49,7 +49,7 @@ router.post('/updateProducts', passport.authenticate('jwt', { session:false }), 
 });
 
 // Get Products
-router.get('/getProducts', passport.authenticate('jwt', {session: false}), (req, res, next) => {
+router.get('/getProducts', passport.authenticate('jwt', {session: false}), (req, res) => {
     // Search products collection with the user id.
     const userId = req.user._id;
 
@@ -60,7 +60,7 @@ router.get('/getProducts', passport.authenticate('jwt', {session: false}), (req,
 });
 
 // Delete Products
-router.post('/deleteProducts', passport.authenticate('jwt', {session: false}), (req, res, next) => {
+router.post('/deleteProducts', passport.authenticate('jwt', {session: false}), (req, res) => {
 
     const products = req.body.items;
     // userId is just used for double verification.
@@ -70,6 +70,18 @@ router.post('/deleteProducts', passport.authenticate('jwt', {session: false}), (
         err ? res.json(err) : res.json(deleted);
     });
 
+});
+
+// Link Items
+router.post('/linkItems', passport.authenticate('jwt', {session: false}), (req, res) => {
+    const toolboxItem = req.body.toolboxItem[0];
+    const marketplaceItem = req.body.marketplaceItem[0];
+    // userId is just used for double verification.
+    const userId = req.user._id;
+
+    configInventory.linkItems(toolboxItem, marketplaceItem, userId, (err, linked) => {
+        err ? res.json(err) : res.json(linked);
+    });
 });
 
 module.exports = router;

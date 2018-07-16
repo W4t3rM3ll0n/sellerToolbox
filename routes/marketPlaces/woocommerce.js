@@ -33,11 +33,25 @@ router.post('/getOrdersByStatus', passport.authenticate('jwt', { session:false }
 });
 
 // Update Orders
+    // Route to update or delete single or multiple orders.
 router.post('/updateWooOrders', passport.authenticate('jwt', { session:false }), (req, res) => {
     const orders = req.body.orders;
+    const action = req.body.action;
     const options = req.body.options;
-    configWoocommerce.updateOrders(orders, options, (err, updated) => {
+    const userId = req.user._id;
+
+    // updateOrders takes 3 possible parameters
+        // @orders - Array of orders, pass empty array if not using
+        // @actions - Object of the action being taken which consists of an array
+        // @options - The type of action to be performs. e.g. 'mark completed'
+    configWoocommerce.updateOrders(orders, action, options, userId, (err, updated) => {
         err ? res.json({err: err}) : res.json(JSON.parse(updated));
+    });
+});
+
+router.get('/getAllProducts', passport.authenticate('jwt', { session:false }), (req, res) => {
+    configWoocommerce.getAllProducts((err, products) => {
+        err ? res.json({err: err}) : res.json(JSON.parse(products));
     });
 });
 

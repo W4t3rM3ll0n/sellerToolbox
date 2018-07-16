@@ -15,44 +15,126 @@
 <button type="button" class="btn btn-outline-warning mr-sm-2" (click)="onEditItems()" *ngIf="editModeOff === true">Edit</button>
 <button type="button" class="btn btn-outline-warning mr-sm-2" (click)="onEditItems()" *ngIf="editModeOff === false">&times;</button>
 <button type="button" class="btn btn-outline-danger mr-sm-2" (click)="onDeleteMultiItems()" *ngIf="editModeOff === false">Delete</button>
+<button type="button" class="btn btn-outline-success float-right" routerLink="/toolbox/linkItems">Link</button>
 
 <br><br>
 
-<div id="scrollStyle" class="horizontal-scroll">
-  <form *ngIf="updateProductsForm" [formGroup]="updateProductsForm" (ngSubmit)="onCreateProducts()">
-    <table *ngIf="inventory" formArrayName="products" class="table table-hover cell-border">
-      <thead>
-        <tr class="table-warning">
-          <th scope="col"></th>
-          <th scope="col">Images</th>
-          <th scope="col" *ngIf="editModeOff === false">Image Links</th>
-          <th scope="col">SKU</th>
-          <th scope="col">Title</th>
-          <th scope="col">Quantity</th>
-          <th scope="col">Available</th>
-          <th scope="col">Alert Quantity</th>
-          <th scope="col">Pending Orders</th>
-          <th scope="col">Needed Quantity</th>
-          <th scope="col">Description</th>
-          <th scope="col">Price</th>
-          <th scope="col">Stock Value</th>
-          <th scope="col">Category</th>
-          <th scope="col">Variation Group</th>
-          <th scope="col">UPC</th>
-          <th scope="col">Barcode</th>
-          <th scope="col">Condition</th>
-          <th scope="col">Location</th>
-          <th scope="col">Weight</th>
-          <th scope="col">Height</th>
-          <th scope="col">Width</th>
-          <th scope="col">Depth</th>
-          <th scope="col">Bin Location</th>
-          <th scope="col">Monitor</th>
-          <th scope="col"></th>
+<form *ngIf="updateProductsForm" [formGroup]="updateProductsForm" (ngSubmit)="onCreateProducts()">
+  <table id="scrollStyle" *ngIf="inventory" formArrayName="products" class="table table-hover table-bordered table-responsive">
+    <thead>
+      <tr class="table-warning">
+        <th scope="col"></th>
+        <th scope="col">Images</th>
+        <th scope="col" *ngIf="editModeOff === false">Image Links</th>
+        <th scope="col">SKU</th>
+        <th scope="col">Title</th>
+        <th scope="col">Quantity</th>
+        <th scope="col">Available</th>
+        <th scope="col">Alert Quantity</th>
+        <th scope="col">Pending Orders</th>
+        <th scope="col">Needed Quantity</th>
+        <th scope="col">Description</th>
+        <th scope="col">Price</th>
+        <th scope="col">Stock Value</th>
+        <th scope="col">Category</th>
+        <th scope="col">Variation Group</th>
+        <th scope="col">UPC</th>
+        <th scope="col">Barcode</th>
+        <th scope="col">Condition</th>
+        <th scope="col">Location</th>
+        <th scope="col">Weight</th>
+        <th scope="col">Height</th>
+        <th scope="col">Width</th>
+        <th scope="col">Depth</th>
+        <th scope="col">Bin Location</th>
+        <th scope="col">Monitor</th>
+        <th scope="col" *ngIf="editModeOff === false"></th>
+      </tr>
+    </thead>
+    <!-- Edit Mode Off -->
+    <ng-template [ngIf]="editModeOff === true">
+      <tbody *ngFor="let product of inventory; let i=index;">
+        <tr (click)="onSelectItem(i)">
+          <td class="align-middle">{{i + 1}}</td>
+            <td class="align-middle">
+              <div class="outer-thumbnail-img" *ngIf="inventory">
+                <img src="{{product.images}}" alt="placeholder" class="img-thumbnail d-block mx-auto">
+              </div>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.sku }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.title }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.quantity.quantity }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.quantity.availableQuantity }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.quantity.alertQuantity }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.quantity.pendingOrders }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.quantity.neededQuantity }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.description }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.price.purchasePrice }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.price.stockValue }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.category }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.variationGroup }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.upc }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.barcode }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.condition }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.location }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.detail.weight }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.detail.height }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.detail.width }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.detail.depth }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.binLocation }}</span>
+            </td>
+            <td class="align-middle">
+              <span>{{ product.monitor }}</span>
+            </td>
+          
         </tr>
-      </thead>
+      </tbody>
+    </ng-template>
+    <!-- Edit Mode On -->
+    <ng-template [ngIf]="editModeOff === false">
       <tbody *ngFor="let product of updateProductsForm.controls.products.controls; let i=index;">
-        <tr class="cell-border" [formGroupName]="i" (click)="onSelectItem(i)">
+        <tr [formGroupName]="i" (click)="onSelectItem(i)">
           <td class="align-middle">{{i + 1}}</td>
             <input 
               type="hidden"
@@ -204,14 +286,10 @@
               <td (click)="onDeleteSingleItems(i)" class="align-middle" style="cursor: pointer;">&times;</td>
             </ng-template>
 
-            <ng-template [ngIf]="editModeOff === true">
-              <td class="align-middle"></td>
-            </ng-template>
-
         </tr>
       </tbody>
-    </table> 
-    <button type="button" class="btn btn-outline-success mr-sm-2" (click)="onUpdateItems()" *ngIf="editModeOff === false">Update</button>
-    <br><br>
-  </form>
-</div>
+    </ng-template>
+  </table> 
+  <button type="button" class="btn btn-outline-success mr-sm-2" (click)="onUpdateItems()" *ngIf="editModeOff === false">Update</button>
+  <br><br>
+</form>

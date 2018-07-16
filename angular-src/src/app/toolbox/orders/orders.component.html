@@ -13,7 +13,7 @@
 <hr>
 
 <div class="form-inline">
-  <button type="button" class="btn btn-outline-warning mr-sm-2" routerLink="/toolbox/createProducts">Create</button>
+  <button type="button" class="btn btn-outline-warning mr-sm-2" routerLink="/toolbox/orders">Create</button>
   <button type="button" class="btn btn-outline-warning mr-sm-2" (click)="onEditOrders()" *ngIf="editModeOff === true">Edit</button>
   <button type="button" class="btn btn-outline-warning mr-sm-2" (click)="onEditOrders()" *ngIf="editModeOff === false">&times;</button>
   <button type="button" class="btn btn-outline-danger mr-sm-2" (click)="onDeleteMultiOrders()" *ngIf="editModeOff === false">Delete</button>
@@ -43,52 +43,51 @@
 
 <hr>
 <!-- Orders Form -->
-<div id="scrollStyle" class="horizontal-scroll">
-  <table class="table table-hover cell-border">
-    <thead>
-      <tr class="table-success">
-        <th scope="col"></th>
-        <th scope="col">Order #</th>
-        <th scope="col">SKU</th>
-        <th scope="col">Item</th>
-        <th scope="col">Quantity</th>
-        <th scope="col">Total</th>
-        <th scope="col">Date</th>
-        <th scope="col"></th>
-      </tr>
-    </thead>
-    <tbody *ngFor="let wooOrder of wooOrders; let i = index;">
-      <tr class="cell-border" (click)="onSelectItem(i)">
-        <td class="align-middle">{{i + 1}}</td>
+<table class="table table-hover table-bordered">
+  <thead>
+    <tr class="table-success">
+      <th scope="col"></th>
+      <th scope="col">Order #</th>
+      <th scope="col">SKU</th>
+      <th scope="col">Item</th>
+      <th scope="col">Quantity</th>
+      <th scope="col">Total</th>
+      <th scope="col">Status</th>
+      <th scope="col">Date</th>
+      <th scope="col" *ngIf="editModeOff === false"></th>
+    </tr>
+  </thead>
+  <tbody *ngFor="let wooOrder of wooOrders; let i = index;">
+    <tr (click)="onSelectItem(i)">
+      <td class="align-middle">{{i + 1}}</td>
 
-        <!-- View Mode -->
-        <td class="align-middle">
-          <span class="h5">{{ wooOrder?.number }}</span>
-        </td>
-        <td class="align-middle">
-          <li class="p" *ngFor="let item of wooOrder.line_items" style="list-style: none">{{ item?.sku }}</li>
-        </td>
-        <td class="align-middle">
-          <li class="p" *ngFor="let item of wooOrder.line_items" style="list-style: none">{{ item?.name }}</li>
-        </td>
-        <td class="align-middle">
-          <li class="h5" *ngFor="let item of wooOrder.line_items" style="list-style: none">{{ item?.quantity }}</li>
-        </td>
-        <td class="align-middle">
-          <span class="p">{{ wooOrder?.total }}</span>
-        </td>
-        <td class="align-middle">
-          <span class="p">{{ wooOrder?.date_created | date }}</span>
-        </td>
+      <!-- View Mode -->
+      <td class="align-middle">
+        <span class="h5">{{ wooOrder?.number }}</span>
+      </td>
+      <td class="align-middle">
+        <li class="p" *ngFor="let item of wooOrder.line_items" style="list-style: none">{{ item?.sku }}</li>
+      </td>
+      <td class="align-middle">
+        <li class="p" *ngFor="let item of wooOrder.line_items" style="list-style: none">{{ item?.name }}</li>
+      </td>
+      <td class="align-middle">
+        <li class="h5" *ngFor="let item of wooOrder.line_items" style="list-style: none">{{ item?.quantity }}</li>
+      </td>
+      <td class="align-middle">
+        <span class="p">{{ wooOrder?.total }}</span>
+      </td>
+      <td class="align-middle">
+        <span class="p">{{ wooOrder?.status }}</span>
+      </td>
+      <td class="align-middle">
+        <span class="p">{{ wooOrder?.date_created | date }}</span>
+      </td>
 
-        <ng-template [ngIf]="editModeOff === false">
-          <td (click)="onDeleteSingleItems(i)" class="align-middle" style="cursor: pointer;">&times;</td>
-        </ng-template>
-        <ng-template [ngIf]="editModeOff === true">
-          <td></td>
-        </ng-template>
+      <ng-template [ngIf]="editModeOff === false">
+        <td (click)="onDeleteSingleItems(i)" class="align-middle" style="cursor: pointer;">&times;</td>
+      </ng-template>
 
-      </tr>
-    </tbody>
-  </table>
-</div>
+    </tr>
+  </tbody>
+</table>

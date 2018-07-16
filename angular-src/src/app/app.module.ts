@@ -36,6 +36,7 @@ import { OrdersComponent } from './toolbox/orders/orders.component';
 import { WoocommerceSettingsComponent } from './auth/user/woocommerce-settings/woocommerce-settings.component';
 import { WoocommerceComponent } from './toolbox/marketplaces/woocommerce/woocommerce.component';
 import { MarketplaceService } from './toolbox/marketplaces/marketplace.service';
+import { LinkItemsComponent } from './toolbox/inventory/link-items/link-items.component';
 
 @NgModule({
   declarations: [
@@ -65,7 +66,8 @@ import { MarketplaceService } from './toolbox/marketplaces/marketplace.service';
     AnalyticsComponent,
     OrdersComponent,
     WoocommerceSettingsComponent,
-    WoocommerceComponent
+    WoocommerceComponent,
+    LinkItemsComponent
   ],
   imports: [
     BrowserModule,

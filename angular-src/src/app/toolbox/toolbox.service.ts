@@ -20,13 +20,17 @@ export class ToolboxService {
     }
 
     // Allow the api call code to be written only once.
-    /* apiCall() {
-        let headers = new Headers();
-        this.loadToken();
-        headers.append('Authorization', this.jwtToken);
-        headers.append('Content-Type', 'application/json');
-        this.jwtToken = null;
-    } */
+    // apiPutCall(contentType, path, postBody, response) {
+    //     let headers = new Headers();
+    //     this.loadToken();
+    //     headers.append('Authorization', this.jwtToken);
+    //     headers.append('Content-Type', contentType);
+    //     this.jwtToken = null;
+    //     return this.http.put('http://localhost:3000'+path, postBody, { headers: headers })
+    //         .pipe(
+    //             map(res => response(res))
+    //         )
+    // }
 
     createItems(productsDetail) {
         let headers = new Headers();
@@ -76,7 +80,7 @@ export class ToolboxService {
             )
     }
 
-    getAllOrders() {
+    getAllWooOrders() {
         let headers = new Headers();
         this.loadToken();
         headers.append('Authorization', this.jwtToken);
@@ -100,15 +104,39 @@ export class ToolboxService {
             )
     }
 
-    updateWooOrders(orders, opt) {
+    updateWooOrders(orders?, action?, opt?) {
         let headers = new Headers();
         this.loadToken();
         headers.append('Authorization', this.jwtToken);
         headers.append('Content-Type', 'application/json');
         this.jwtToken = null;
-        return this.http.post('http://localhost:3000/woocommerce/updateWooOrders', { orders: orders, options: opt }, { headers: headers })
+        return this.http.post('http://localhost:3000/woocommerce/updateWooOrders', { orders: orders, action: action, options: opt }, { headers: headers })
             .pipe(
                 map(wooOrders => wooOrders.json())
+            )
+    }
+
+    getAllWooProducts() {
+        let headers = new Headers();
+        this.loadToken();
+        headers.append('Authorization', this.jwtToken);
+        headers.append('Content-Type', 'application/json');
+        this.jwtToken = null;
+        return this.http.get('http://localhost:3000/woocommerce/getAllProducts', { headers: headers })
+            .pipe(
+                map(wooProducts => wooProducts.json())
+            )
+    }
+
+    linkItems(items) {
+        let headers = new Headers();
+        this.loadToken();
+        headers.append('Authorization', this.jwtToken);
+        headers.append('Content-Type', 'application/json');
+        this.jwtToken = null;
+        return this.http.post('http://localhost:3000/toolbox/inventory/linkItems', items, { headers: headers })
+            .pipe(
+                map(items => items.json())
             )
     }
 

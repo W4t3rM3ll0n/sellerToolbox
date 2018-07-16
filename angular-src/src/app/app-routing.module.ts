@@ -26,6 +26,7 @@ import { AnalyticsComponent } from './toolbox/analytics/analytics.component';
 import { OrdersComponent } from './toolbox/orders/orders.component';
 import { WoocommerceSettingsComponent } from './auth/user/woocommerce-settings/woocommerce-settings.component';
 import { WoocommerceComponent } from './toolbox/marketplaces/woocommerce/woocommerce.component';
+import { LinkItemsComponent } from './toolbox/inventory/link-items/link-items.component';
 
 const appRoutes: Routes = [
     {path: '', component: HomeComponent},
@@ -34,6 +35,7 @@ const appRoutes: Routes = [
         { path: 'dashboard', component: DashboardComponent },
         { path: 'inventory', component: InventoryComponent },
         { path: 'createProducts', component: CreateProductsComponent },
+        { path: 'linkItems', component: LinkItemsComponent },
         { path: 'orders', component: OrdersComponent },
         { path: 'toDo', component: ToDoComponent },
         { path: 'analytics', component: AnalyticsComponent },

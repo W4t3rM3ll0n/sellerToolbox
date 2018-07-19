@@ -1,5 +1,4 @@
 'use strict'
-
 const mongoose = require('mongoose');
 
 // Products Schema
@@ -17,9 +16,10 @@ const productsSchema = new Schema({
         quantity: Number, // Total quantity available on hand.
         availableQuantity: Number, // Total quantity available after subtracting items in pending orders.
         alertQuantity: Number, // The minimum quantity needed to be alerted for reorder.
-        pendingOrders: Number, // The quantity that are available but subtracted since ther is a pending order.
+        pendingOrders: Number,
         neededQuantity: Number // The needed quantity to meet the requirement to not trigger the alert quantity.
     },
+    orders: [], // Orders that are pending from the item that is linked.
     description: String,
     upc: String,
     barcode: String,

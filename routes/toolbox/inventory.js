@@ -13,6 +13,15 @@ router.get('/', (req, res) => {
     res.send('hello there from inventory');
 });
 
+// Default updates for inventory - updates sections such as pending orders and available quantity.
+router.get('/defaultUpdates', passport.authenticate('jwt', { session:false }), (req, res) => {
+    const userId = req.user._id;
+
+    configInventory.defaultUpdates(userId, (err, updates) => {
+        err ? res.json({error: err}) : res.json({updates: updates});
+    });
+});
+
 // Create Products
 router.put('/createProducts', passport.authenticate('jwt', { session:false }), (req, res) => {
 
@@ -27,7 +36,7 @@ router.put('/createProducts', passport.authenticate('jwt', { session:false }), (
     // console.log(products);
     
     configInventory.addProducts(products, (err, response) => {
-        err ? res.json(err) : res.json(response);
+        err ? res.json({error: err}) : res.json(response);
     });
 
 });
@@ -43,7 +52,7 @@ router.post('/updateProducts', passport.authenticate('jwt', { session:false }), 
     // console.log(products);
 
     configInventory.updateProducts(products, userId, (err, response) => {
-        err ? res.json(err) : res.json(response);
+        err ? res.json({error: err}) : res.json(response);
     });
 
 });
@@ -54,7 +63,7 @@ router.get('/getProducts', passport.authenticate('jwt', {session: false}), (req,
     const userId = req.user._id;
 
     configInventory.getProducts(userId, (err, products) => {
-        err ? res.json(err) : res.json(products);
+        err ? res.json({error: err}) : res.json(products);
     });
 
 });
@@ -67,7 +76,7 @@ router.post('/deleteProducts', passport.authenticate('jwt', {session: false}), (
     const userId = req.user._id;
 
     configInventory.deleteProducts(products, userId, (err, deleted) => {
-        err ? res.json(err) : res.json(deleted);
+        err ? res.json({error: err}) : res.json(deleted);
     });
 
 });
@@ -80,7 +89,7 @@ router.post('/linkItems', passport.authenticate('jwt', {session: false}), (req, 
     const userId = req.user._id;
 
     configInventory.linkItems(toolboxItem, marketplaceItem, userId, (err, linked) => {
-        err ? res.json(err) : res.json(linked);
+        err ? res.json({error: err}) : res.json(linked);
     });
 });
 

@@ -18,16 +18,17 @@ const address = {
 // Products Schema
 const Schema = mongoose.Schema;
 const ordersSchema = new Schema({
-    currency: String,
+    marketplaceID: String,
+    marketplace: String,
     billing: address,
     shipping: address,
     orderItems: [],
+    currency: String,
     total: Number,
     totalTax: Number,
     shippingTotal: Number,
     refunds: [],
     paymentMethod: String,
-    marketplaceID: String,
     paidDate: Date,
     createdDate: Date,
     modifiedDate: Date,

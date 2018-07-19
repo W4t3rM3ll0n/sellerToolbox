@@ -29,20 +29,25 @@ export class InventoryComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // Get the user information for address.
     this.authService.getProfile()
-      .subscribe(
-        (user) => {
+      .subscribe((user) => {
           // console.log(user);
           this.user = user;
-        }
-      )
+        },
+        err => console.log(err));
+    
+    this.toolboxService.defaultUpdates()
+      .subscribe((updates) => {
+        console.log(updates);
+      },
+      err => console.log(err));
+
     // Getting the products from the database.
     this.toolboxService.getProducts()
-      .subscribe(
-        (inventory) => {
+      .subscribe((inventory) => {
           this.inventory = inventory;
           this.initForm();
-        }
-      )
+        },
+        err => console.log(err));
   }
 
   initForm() {

@@ -32,6 +32,18 @@ export class ToolboxService {
     //         )
     // }
 
+    defaultUpdates() {
+        let headers = new Headers();
+        this.loadToken();
+        headers.append('Authorization', this.jwtToken);
+        headers.append('Content-Type', 'application/json');
+        this.jwtToken = null;
+        return this.http.get('http://localhost:3000/toolbox/inventory/defaultUpdates', { headers: headers })
+            .pipe(
+                map(updates => updates.json())
+            )  
+    }
+
     createItems(productsDetail) {
         let headers = new Headers();
         this.loadToken();
@@ -75,6 +87,78 @@ export class ToolboxService {
         headers.append('Content-Type', 'application/json');
         this.jwtToken = null;
         return this.http.post('http://localhost:3000/toolbox/inventory/deleteProducts', {items: items}, { headers: headers })
+            .pipe(
+                map(deleted => deleted.json())
+            )
+    }
+
+    getAllOrders() {
+        let headers = new Headers();
+        this.loadToken();
+        headers.append('Authorization', this.jwtToken);
+        headers.append('Content-Type', 'application/json');
+        this.jwtToken = null;
+        return this.http.get('http://localhost:3000/toolbox/orders/getAllOrders', { headers: headers })
+            .pipe(
+                map(orders => orders.json())
+            )
+    }
+
+    getOrdersByStatus(status) {
+        let headers = new Headers();
+        this.loadToken();
+        headers.append('Authorization', this.jwtToken);
+        headers.append('Content-Type', 'application/json');
+        this.jwtToken = null;
+        return this.http.post('http://localhost:3000/toolbox/orders/getOrdersByStatus', { status: status }, { headers: headers })
+            .pipe(
+                map(orders => orders.json())
+            )
+    }
+
+    saveOrders(orders) {
+        let headers = new Headers();
+        this.loadToken();
+        headers.append('Authorization', this.jwtToken);
+        headers.append('Content-Type', 'application/json');
+        this.jwtToken = null;
+        return this.http.post('http://localhost:3000/toolbox/orders/saveOrders', { orders: orders }, { headers: headers })
+            .pipe(
+                map(orders => orders.json())
+            )
+    }
+
+    updateOrders(orders, options) {
+        let headers = new Headers();
+        this.loadToken();
+        headers.append('Authorization', this.jwtToken);
+        headers.append('Content-Type', 'application/json');
+        this.jwtToken = null;
+        return this.http.post('http://localhost:3000/toolbox/orders/updateOrders', { orders: orders, options: options }, { headers: headers })
+            .pipe(
+                map(updated => updated.json())
+            )
+    }
+
+    deleteSingleOrder(orderID) {
+        let headers = new Headers();
+        this.loadToken();
+        headers.append('Authorization', this.jwtToken);
+        headers.append('Content-Type', 'application/json');
+        this.jwtToken = null;
+        return this.http.post('http://localhost:3000/toolbox/orders/deleteSingleOrder', { orderID: orderID }, { headers: headers })
+            .pipe(
+                map(deleted => deleted.json())
+            )
+    }
+
+    deleteOrders(orders) {
+        let headers = new Headers();
+        this.loadToken();
+        headers.append('Authorization', this.jwtToken);
+        headers.append('Content-Type', 'application/json');
+        this.jwtToken = null;
+        return this.http.post('http://localhost:3000/toolbox/orders/deleteOrders', { orders: orders }, { headers: headers })
             .pipe(
                 map(deleted => deleted.json())
             )

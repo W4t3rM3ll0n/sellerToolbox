@@ -8,7 +8,8 @@
       name="search"
       ngModel
       placeholder="Search">
-    <button class="btn btn-secondary" type="submit">Search</button>
+    <button class="btn btn-secondary mr-sm-2" type="submit">Search</button>
+    <button type="button" class="btn btn-success mr-sm-2" (click)="onSaveOrders()">Sync Orders</button>
 </form>
 <hr>
 
@@ -27,15 +28,15 @@
     <option value="all">All Orders</option>
   </select>
   <button type="button" class="btn btn-outline-success mr-sm-2 float-right" (click)="onPrintOrder()">Print</button>
-  <ul class="nav nav-pills">
+  <ul class="nav nav-pills mr-sm-2">
     <li class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" (click)="openDropdown()" style="cursor: pointer;">Actions</a>
       <div id="dropdownToggle" class="dropdown-menu">
-        <a class="dropdown-item" style="cursor: pointer;" (click)="onUpdateWooOrders('completed')">Mark as completed</a>
-        <a class="dropdown-item" style="cursor: pointer;" (click)="onUpdateWooOrders('processing')">Mark as Processing</a>
-        <a class="dropdown-item" style="cursor: pointer;" (click)="onUpdateWooOrders('pending')">Mark as Pending</a>
-        <a class="dropdown-item" style="cursor: pointer;" (click)="onUpdateWooOrders('cancelled')">Mark as Cancelled</a>
-        <a class="dropdown-item" style="cursor: pointer;" (click)="onUpdateWooOrders('on-hold')">Hold order</a>
+        <a class="dropdown-item" style="cursor: pointer;" (click)="onUpdateOrders('completed')">Mark as completed</a>
+        <a class="dropdown-item" style="cursor: pointer;" (click)="onUpdateOrders('processing')">Mark as Processing</a>
+        <a class="dropdown-item" style="cursor: pointer;" (click)="onUpdateOrders('pending')">Mark as Pending</a>
+        <a class="dropdown-item" style="cursor: pointer;" (click)="onUpdateOrders('cancelled')">Mark as Cancelled</a>
+        <a class="dropdown-item" style="cursor: pointer;" (click)="onUpdateOrders('on-hold')">Hold order</a>
       </div>
     </li>
   </ul>
@@ -57,35 +58,34 @@
       <th scope="col" *ngIf="editModeOff === false"></th>
     </tr>
   </thead>
-  <tbody *ngFor="let wooOrder of wooOrders; let i = index;">
+  <tbody *ngFor="let order of orders?.orders; let i = index;">
     <tr (click)="onSelectItem(i)">
       <td class="align-middle">{{i + 1}}</td>
-
       <!-- View Mode -->
       <td class="align-middle">
-        <span class="h5">{{ wooOrder?.number }}</span>
+        <span class="h5">{{ order.marketplaceID }}</span>
       </td>
       <td class="align-middle">
-        <li class="p" *ngFor="let item of wooOrder.line_items" style="list-style: none">{{ item?.sku }}</li>
+        <li class="p" *ngFor="let item of order.orderItems" style="list-style: none">{{ item.sku }}</li>
       </td>
       <td class="align-middle">
-        <li class="p" *ngFor="let item of wooOrder.line_items" style="list-style: none">{{ item?.name }}</li>
+        <li class="p" *ngFor="let item of order.orderItems" style="list-style: none">{{ item.name }}</li>
       </td>
       <td class="align-middle">
-        <li class="h5" *ngFor="let item of wooOrder.line_items" style="list-style: none">{{ item?.quantity }}</li>
+        <li class="h5" *ngFor="let item of order.orderItems" style="list-style: none">{{ item.quantity }}</li>
       </td>
       <td class="align-middle">
-        <span class="p">{{ wooOrder?.total }}</span>
+        <span class="p">{{ order.total }}</span>
       </td>
       <td class="align-middle">
-        <span class="p">{{ wooOrder?.status }}</span>
+        <span class="p">{{ order.status }}</span>
       </td>
       <td class="align-middle">
-        <span class="p">{{ wooOrder?.date_created | date }}</span>
+        <span class="p">{{ order.createdDate | date }}</span>
       </td>
 
       <ng-template [ngIf]="editModeOff === false">
-        <td (click)="onDeleteSingleItems(i)" class="align-middle" style="cursor: pointer;">&times;</td>
+        <td (click)="onDeleteSingleOrder(i)" class="align-middle" style="cursor: pointer;">&times;</td>
       </ng-template>
 
     </tr>

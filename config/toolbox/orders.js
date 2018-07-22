@@ -88,159 +88,131 @@ module.exports = {
     },
 
     updateOrders(orders, options, userId, callback) {
-
         // Loop through orders array passed from this parameter.
         if(options === 'completed') {
-            const matchedOrdersToBeRemoved = [];
             const itemSKUInOrder = [];
+            const ordersToRemove = [];
 
-            // Get to orders to be removed from the product.orders array.
-            const getOrdersToRemove = () => {
+            // Get orders to remove from linked products.
+            function getOrdersToRemove() {
                 return new Promise((resolve, reject) => {
-                    // Sort and loop through the orders that were passed in from the parameter.
+                    let productQueryFlag = 0;
+                    let orderItemLength = 0;
+                    // Loop through the orders passed in from the parameter. Sort it by marketplaceID.
                     orders.sort((a, b) => { return a.marketplaceID - b.marketplaceID }).forEach(order => {
-                        // Loop through each item inside of the order.
+                        // console.log(order.marketplaceID);
+                        ordersToRemove.push({ marketplaceID: order.marketplaceID });
+                        orderItemLength += order.orderItems.length;
+                        // console.log(order.marketplaceID);
+                        // Loop through each item from the orders that were passed.
                         order.orderItems.forEach(orderItem => {
-                            // Find the products by sku from the items inside each order.
-                            Products.find({ sku: orderItem.sku, userId: userId }).then(foundProducts => {
-                                // Loop through the found products to analyze each one.
-                                foundProducts.forEach(product => {
-                                    // Checking to make sure the passed product from the order is a linked item in the backen.
-                                    const linkedItemIndex = product.linked.woocommerce.map(linkedItem => {
+                            // console.log(orderItem);
+                            // Find the product in the database based off each item from the order.
+                            Products.findOne({ sku: orderItem.sku, userId, userId}).then(foundProduct => {
+                                // console.log(foundProduct);
+                                // If the product is found in the database.
+                                if(foundProduct !== null) {
+                                    // Check to see if the product is linked with a marketplace. 
+                                    // Search the linked product inside product and compare the id with the orderItem products id.
+                                    const linkedItemIndex = foundProduct.linked.woocommerce.map(linkedItem => {
                                         return linkedItem.id;
                                     }).indexOf(orderItem.product_id);
 
-                                    // If the item is confirmed and linked.
                                     if(linkedItemIndex > -1) {
-                                        itemSKUInOrder.push(orderItem.sku);
-                                        // Check to see if the orders that is passed in matches a order inside of the products model.
-                                        const matchedOrderIndex = product.orders.sort((a, b) => { return a.marketplaceID - b.marketplaceID }).map(ordersInProduct => {
-                                            return ordersInProduct.marketplaceID;
-                                        }).indexOf(order.marketplaceID);
-                                        
-                                        if(matchedOrderIndex > -1) {
-                                            // Getting all the orders that are matched to be removed
-                                            matchedOrdersToBeRemoved.push(...product.orders.splice(matchedOrderIndex, 1));
-                                        } else return false;
-    
-                                    } else return false;
+                                        // Push each item sku and quantity from the order into itemSKUInOrder [].
+                                        itemSKUInOrder.push({ sku: orderItem.sku, quantity: orderItem.quantity });
+                                    } else itemSKUInOrder.push({ sku: null, quantity: null });;
 
-                                    // Check through each loop if the 2 arrays match in length. This section causes hang time if there are no orders inside a product.
-                                    // I think it can be fixed by updating the product at all possible locations the orders length can change.
-                                    matchedOrdersToBeRemoved.length === orders.length ? resolve() : null;
-                                })
+                                    productQueryFlag++
+
+                                } else { productQueryFlag++; console.log('Product not found'); };
+
+                                // If program has looped the same amount of time there are products in the order.
+                                productQueryFlag === orderItemLength ? resolve() : null;;
+
                             }).catch(err => reject(err));
                         });
+                        Orders.update({ _id: order._id, userId: userId }, { status: options }, (err, updated) => err ? reject(err) : false);
                     });
-                })
-            }
-
-            const removeAndUpdateOrders = () => {
-                return new Promise((resolve, reject) => {
-                    itemSKUInOrder.forEach((item) => {
-                        Products.findOne({sku: item, userId: userId}, (err, product) => {
-                            if(err) reject(err);
-                            matchedOrdersToBeRemoved.forEach(matchedOrder => {
-                                const index = product.orders.sort((a, b) => { return a.marketplaceID - b.marketplaceID }).map(order => {
-                                    return order.marketplaceID;
-                                }).indexOf(matchedOrder.marketplaceID);
-    
-                                if(index > -1) {
-                                    product.quantity.quantity = product.quantity.quantity - 1;
-                                    product.orders.splice(index, 1);
-                                } else return false;
-
-                                Orders.update({ _id: matchedOrder._id, userId: userId }, { status: options }, err => err ? reject(err) : false);
-
-                            });
-                            product.quantity.pendingOrders = product.orders.length;
-                            product.save()
-                            resolve()
-                        })
-                    })
                 });
             }
 
-            getOrdersToRemove().then(() => {
-                return removeAndUpdateOrders();
-            }).then(() => {
-                callback(null, 'done');
-            }).catch(err => callback(err, null));
+            function removeAndUpdateOrders() {
+                return new Promise((resolve, reject) => {
+                    let resolveUpdateFlag = 0;
+                    // Loop through the items that are linked in the database.
+                    if(itemSKUInOrder.length > 0) {
+                        itemSKUInOrder.forEach(item => {
+                            resolveUpdateFlag++
+                            if(item.sku !== null) {
+                                Products.findOne({ sku: item.sku, userId: userId }).then(productToUpdate => {
+                                    // console.log(productToUpdate);
+                                    // Get each order in the product to be removed.
+                                    ordersToRemove.forEach(order => {
+                                        const removeOrderIndex = productToUpdate.orders.map(eachOrder => {
+                                            return eachOrder.marketplaceID;
+                                        }).indexOf(order.marketplaceID);
+        
+                                        if(removeOrderIndex > -1) {
+                                            productToUpdate.orders.splice(removeOrderIndex, 1);
+                                            productToUpdate.quantity.pendingOrders = productToUpdate.orders.length;
+                                            console.log(item.quantity);
+                                            productToUpdate.quantity.quantity -= item.quantity;
+                                            productToUpdate.save();
+                                        } else return false;
+                                    });
+                                }).catch(err => reject(err));
+                            };
+
+                            if(resolveUpdateFlag === itemSKUInOrder.length) {
+                                resolve();
+                            }
+
+                        });
+                    } else { console.log('No orders to be removed'); resolve(); };
+                });
+            }
+
+            getOrdersToRemove()
+                .then(() => {
+                    return removeAndUpdateOrders();
+                })
+                .then(() => {
+                    callback(null, 'done');
+                })
+            .catch(err => callback(err, null));
 
         } else {
+            let updateQty = 0;
+            // Loop through the orders object from the orders parameter
             orders.forEach((order) => {
                 // Loop through orderItems array of each order from the orders parameter
-                order.orderItems.forEach((item) => {
+                order.orderItems.forEach((orderItem) => {
                     // Find the sku item that matches the orderItem
-                    Products.findOne({sku: item.sku, userId: userId})
-                        .then((found) => {
-                            // Check to see if the found sku is linked.
-                            const linkedIndex = found.linked.woocommerce.map((linked) => {
+                    Products.findOne({sku: orderItem.sku, userId: userId})
+                        .then((foundProduct) => {
+                            // Check to see if the found sku is linked
+                            const linkedIndex = foundProduct.linked.woocommerce.map((linked) => {
                                 return linked.id;
-                            }).indexOf(item.product_id);
-                            // If the item is linked in the back end.
+                            }).indexOf(orderItem.product_id);
+                            // If the item is linked in the back end
                             if(linkedIndex > -1) {
-                                // Subract the total quantity available with the item quantity from marketplace.
-                                found.quantity.quantity = found.quantity.quantity - item.quantity;
-                                found.save();
+                                updateQty += orderItem.quantity;
                             } else return false;
-                            console.log(found.orders.length);
-                            found.quantity.pendingOrders = found.orders.length;
-                            // console.log(found.orders.length);
-                            
+
+                            // console.log(updateQty);
+                            foundProduct.quantity.pendingOrders += 1;
+                            foundProduct.quantity.quantity += updateQty;
+                            foundProduct.save();
                         })
                         .catch(err => console.log('No items found that are linked: ' +err));
                     });
                     Orders.update({ _id: order._id, userId: userId }, { status: options }, (err, updated) => {
                         err ? callback(err, null) : null;
-                    })
+                    });
                 });
                 callback(null, 'Orders have been updated');
         }
-
-        // Loop through orders array passed from this parameter
-        // if(options === 'completed') {
-            // orders.forEach((order) => {
-            //     // Loop through orderItems array of each order from the orders parameter
-            //     order.orderItems.forEach((item) => {
-            //         // Find the sku item that matches the orderItem
-            //         Products.findOne({sku: item.sku, userId: userId})
-            //             .then((found) => {
-            //                 // Check to see if the found sku is linked.
-            //                 const linkedIndex = found.linked.woocommerce.map((linked) => {
-            //                     return linked.id;
-            //                 }).indexOf(item.product_id);
-            //                 // If the item is linked in the back end.
-            //                 if(linkedIndex > -1) {
-            //                     // Subract the total quantity available with the item quantity from marketplace.
-            //                     found.quantity.quantity = found.quantity.quantity - item.quantity;
-            //                     // Trying to remove orders inside item and update pendingOrders. Currently can not do in bulk.
-            //                     const ordersInProductIndex = found.orders.map(eachOrder => eachOrder.marketplaceID).indexOf(order.marketplaceID);
-            //                     found.orders.splice(ordersInProductIndex, 1);
-
-            //                     // found.orders.forEach((eachOrder) => {
-            //                     //     if(eachOrder.marketplaceID === order.marketplaceID) {
-            //                     //         // test.push()
-            //                     //         console.log(eachOrder);
-            //                     //     };
-            //                     // });
-
-            //                     found.save();
-            //                 } else return false;
-            //                 console.log(found.orders.length);
-            //                 found.quantity.pendingOrders = found.orders.length;
-            //                 // console.log(found.orders.length);
-                            
-            //             })
-            //             .catch(err => console.log('No items found that are linked: ' +err));
-            //         });
-            //         Orders.update({ _id: order._id, userId: userId }, { status: options }, (err, updated) => {
-            //             err ? callback(err, null) : null;
-            //         })
-            //     });
-            //     callback(null, 'Orders have been updated');
-            // }
-
     },
 
     // Merge deleteSingleOrder && deleteOrders into one method.

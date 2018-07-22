@@ -133,7 +133,6 @@ module.exports = {
 
         configHttp.postJSON(opt, postData, res, (statusCode, result) => {
             statusCode !== 200 ? callback(result, null) : callback(null, result);
-
         });
         
     },

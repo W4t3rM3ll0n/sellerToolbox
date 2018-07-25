@@ -93,8 +93,13 @@ module.exports = {
         const updateInfo = [];
 
         const getProductsAndInfo = new Promise((resolve, reject) => {
+            // This flag adds 1 each time a item whether it is linked or not is processed.
+            let eachItemFlag = 0;
+            // This flag adds the amount each order has. // Item qty is void.
+            let totalItem = 0;
             // Loop through the orders that are passed from the parameter.
-            orders.forEach((order, index) => {
+            orders.forEach(order => {
+                totalItem += order.orderItems.length;
                 order.orderItems.forEach(orderItem => {
                     // Find each product by sku from the order items.
                     Products.findOne({sku: orderItem.sku, userId: userId})
@@ -105,6 +110,7 @@ module.exports = {
                                     return linkedItem.id;
                                 }).indexOf(orderItem.product_id);
                                 if(linkedItemIndex > -1) {
+                                    eachItemFlag++
                                     // Get the index of the foundProduct compared to the foundProducts [].
                                     const productIndex = foundProducts.map(product => {
                                         return product.sku;
@@ -116,9 +122,18 @@ module.exports = {
                                     };
                                     // console.log(orderItem);
                                     updateInfo.push({ sku: orderItem.sku, quantity: orderItem.quantity, marketplaceID: order.marketplaceID });
-                                };
-                                if(index === orders.length - 1) resolve();
-                            } else console.log('Product not found');
+                                } else { eachItemFlag++ };
+                            } else {
+                                eachItemFlag++
+                                console.log('Product not found')
+                            };
+
+                            // console.log(totalItem);
+                            // console.log(eachItemFlag);
+                            if(totalItem === eachItemFlag) {
+                                console.log('getProductsAndInfo Completed');
+                                resolve();
+                            };
                         })
                     .catch(err => reject(err));
                 });
@@ -128,36 +143,47 @@ module.exports = {
 
         const updateProducts = () => {
             return new Promise((resolve, reject) => {
+                let completePromise = false;
+                let completeLoopFlag = 0;
                 // Loop through each product that was found.
-                foundProducts.forEach((product, index) => {
-                    // Search for a single product based on the product found.
-                    Products.findOne({ sku: product.sku, userId: userId })
-                        .then(foundProduct => {
-                            let updateQty = 0;
-                            // Loop through the updateInfo to get the total update quantity based on each item.
-                            updateInfo.forEach(item => {
-                                if(item.sku === foundProduct.sku) {
-                                    updateQty += item.quantity;
-                                };
-                            });
-                            // Update the quantity.
-                            if(options === 'completed') {
-                                // foundProduct.orders = [];
-                                foundProduct.quantity.quantity -= updateQty;
-                                foundProduct.save();
-                            } else {
-                                // foundProduct.orders = [];
-                                foundProduct.quantity.quantity += updateQty;
-                                foundProduct.save();
-                            }
-                        })
-                    .catch(err => reject(err));
-                    if(index === foundProducts.length - 1) resolve();
+                foundProducts.forEach((foundProduct) => {
+                    let updateQty = 0;
+                    // Loop through the updateInfo to get the total update quantity based on each item.
+                    updateInfo.forEach(item => {
+                        if(item.sku === foundProduct.sku) {
+                            updateQty += item.quantity;
+                        }
+                        completeLoopFlag++
+                        if(completeLoopFlag === updateInfo.length) {
+                            completePromise = true;
+                        }
+                    });
+
+                    // Update the quantity.
+                    if(options === 'completed') {
+                        // foundProduct.orders = [];
+                        foundProduct.quantity.quantity -= updateQty;
+                        // foundProduct.save();
+                    } else if(options !== 'completed') {
+                        // foundProduct.orders = [];
+                        foundProduct.quantity.quantity += updateQty;
+                        // foundProduct.save();
+                    }
+
+                    if(completePromise === true) {
+                        // console.log(foundProduct);
+                        Products.update({ _id: foundProduct._id }, foundProduct)
+                            .then(() => {
+                                console.log('updateProducts Completed');
+                                resolve();
+                            })
+                        .catch(err => reject(err));
+                    }
                 });
             });
         }
 
-        const removeOrdersOrAddFromProduct = () => {
+        const removeOrdersFromProduct = () => {
             return new Promise((resolve, reject) => {
                 // Loop through the foundProducts []. Contains found product at the current state in database.
                 foundProducts.forEach(foundProduct => {
@@ -170,31 +196,15 @@ module.exports = {
                         // If its a match and the index is greater than 0 then splice the order out of foundProduct orders.
                         if(orderItemIndex > -1 && options === 'completed') {
                             foundProduct.orders.splice(orderItemIndex, 1);
-                        } 
-                        
-                        /* Currently we can not mark as processing and update the product orders */
-                        /* else if (options !== 'completed') { // Have to put this condition because orders is empty sometimes during testing.
-                            // Here we are going to update the Product when marked as processing or other order status. We need to push the orders into the Product.orders.
-                            Orders.findOne({ marketplaceID: item.marketplaceID })
-                                .then(orderToBeUploaded => {
-                                    const orderIndex = foundProduct.orders.map(eachOrder => {
-                                        return eachOrder.marketplaceID
-                                    }).indexOf(orderToBeUploaded.marketplaceID);
+                        }
 
-                                    if(orderIndex < 0) {
-                                        foundProduct.orders.push(orderToBeUploaded);
-                                    };
-
-                                })
-                            .catch(err => reject(err));
-                        } */
-
-                        if(index === array.length - 1) {
+                        if(index === array.length-1) {
                             // After the loop above is completed update the Products based on the resulted object of foundProduct.
-                            console.log(foundProduct);
+                            // console.log(foundProduct);
                             foundProduct.quantity.pendingOrders = foundProduct.orders.length;
                             Products.update({sku: foundProduct.sku}, foundProduct)
                                 .then(() => {
+                                    console.log('removeOrdersFromProduct Completed');
                                     resolve();
                                 })
                             .catch(err => reject(err));
@@ -204,11 +214,53 @@ module.exports = {
             });
         }
 
+        function addOrdersToProduct() {
+            return new Promise((resolve, reject) => {
+                // Loop through the foundProducts []. Contains found product at the current state in database.
+                foundProducts.forEach(foundProduct => {
+                    // Loop through the updateInfo []. Update info contains sku, qty & marketplaceID from current state of order.
+                    updateInfo.forEach(item => {
+                        // Here we are going to update the Product when marked as processing or other order status. We need to push the orders into the Product.orders.
+                        Orders.findOne({ marketplaceID: item.marketplaceID }, (err, orderToBeUploaded) => {
+                            if(err) reject(err);
+                                // If during the loop the updateInfo sku is the same as the foundProduct sku .
+                                if(item.sku === foundProduct.sku) {
+                                    // Check to see if the order exists or not within the foundProduct.orders. We check with orderToBeUploaded.marketplaceID.
+                                    const orderIndex = foundProduct.orders.map(eachOrder => {
+                                        return eachOrder.marketplaceID;
+                                    }).indexOf(orderToBeUploaded.marketplaceID);
+        
+                                    // console.log(orderIndex);
+                                    // If the order does not exist within the orders object of the product, we push the orderToBeUploaded into orders.
+                                    if(orderIndex < 0) {
+                                        foundProduct.orders.push(orderToBeUploaded);
+                                    }
+                                }
+
+                            // After the loop above is completed update the Products based on the resulted object of foundProduct.
+                            // console.log(foundProduct);
+                            foundProduct.quantity.pendingOrders = foundProduct.orders.length;
+                            Products.update({sku: foundProduct.sku}, foundProduct)
+                                .then(() => {
+                                    console.log('addOrdersToProduct Completed');
+                                    resolve();
+                                })
+                            .catch(err => reject(err));
+                        });
+                    });
+                });
+            });
+        }
+
         getProductsAndInfo.then(() => {
                 return updateProducts();
             })
             .then(() => {
-                return removeOrdersOrAddFromProduct();
+                if(options === 'completed') {
+                    return removeOrdersFromProduct();
+                } else if(options !== 'completed') {
+                    return addOrdersToProduct();
+                }
             })
             .then(() => {
                 callback(null, 'done');

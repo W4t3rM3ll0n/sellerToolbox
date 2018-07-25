@@ -161,43 +161,45 @@ module.exports = {
             return new Promise((resolve, reject) => {
                 // Loop through the foundProducts []. Contains found product at the current state in database.
                 foundProducts.forEach(foundProduct => {
-                    const innerPromise = new Promise((resolve,reject) => {
+                    // Loop through the updateInfo []. Update info contains sku, qty & marketplaceID from current state of order.
+                    updateInfo.forEach((item, index, array) => {
+                        // If the foundProduct orders matches the updateInfo's item.marketplaceID the get the index.
+                        const orderItemIndex = foundProduct.orders.map(eachOrder => {
+                            return eachOrder.marketplaceID;
+                        }).indexOf(item.marketplaceID);
+                        // If its a match and the index is greater than 0 then splice the order out of foundProduct orders.
+                        if(orderItemIndex > -1 && options === 'completed') {
+                            foundProduct.orders.splice(orderItemIndex, 1);
+                        } 
                         
-                    })
-                        // Loop through the updateInfo []. Update info contains sku, qty & marketplaceID from current state of order.
-                        updateInfo.forEach(item => {
-                            // If the foundProduct orders matches the updateInfo's item.marketplaceID the get the index.
-                            const orderItemIndex = foundProduct.orders.map(eachOrder => {
-                                return eachOrder.marketplaceID;
-                            }).indexOf(item.marketplaceID);
-                            // If its a match and the index is greater than 0 then splice the order out of foundProduct orders.
-                            if(orderItemIndex > -1 && options === 'completed') {
-                                foundProduct.orders.splice(orderItemIndex, 1);
-                                console.log('completed');
-                            } else if (options !== 'completed') { // Have to put this condition because orders is empty sometimes during testing.
-                                // Here we are going to update the Product when marked as processing or other order status. We need to push the orders into the Product.orders.
-                                Orders.find({ marketplaceID: item.marketplaceID })
-                                    .then(orderToBeUploaded => {
-                                        const orderIndex = foundProduct.orders.map(eachOrder => eachOrder.marketplaceID).indexOf(orderToBeUploaded.marketplaceID);
+                        /* Currently we can not mark as processing and update the product orders */
+                        /* else if (options !== 'completed') { // Have to put this condition because orders is empty sometimes during testing.
+                            // Here we are going to update the Product when marked as processing or other order status. We need to push the orders into the Product.orders.
+                            Orders.findOne({ marketplaceID: item.marketplaceID })
+                                .then(orderToBeUploaded => {
+                                    const orderIndex = foundProduct.orders.map(eachOrder => {
+                                        return eachOrder.marketplaceID
+                                    }).indexOf(orderToBeUploaded.marketplaceID);
 
-                                        if(orderIndex < 0) {
-                                            console.log(orderToBeUploaded)
-                                            console.log('===========')
-                                            foundProduct.orders.push(orderToBeUploaded);
-                                        };
-                                    })
-                                .catch(err => reject(err));
+                                    if(orderIndex < 0) {
+                                        foundProduct.orders.push(orderToBeUploaded);
+                                    };
 
-                            }
-                        });
-                    // After the loop above is completed update the Products based on the resulted object of foundProduct.
-                    console.log(foundProduct);
-                    foundProduct.quantity.pendingOrders = foundProduct.orders.length;
-                    Products.update({sku: foundProduct.sku}, foundProduct)
-                        .then(() => {
-                            resolve();
-                        })
-                    .catch(err => reject(err));
+                                })
+                            .catch(err => reject(err));
+                        } */
+
+                        if(index === array.length - 1) {
+                            // After the loop above is completed update the Products based on the resulted object of foundProduct.
+                            console.log(foundProduct);
+                            foundProduct.quantity.pendingOrders = foundProduct.orders.length;
+                            Products.update({sku: foundProduct.sku}, foundProduct)
+                                .then(() => {
+                                    resolve();
+                                })
+                            .catch(err => reject(err));
+                        }
+                    });
                 });
             });
         }

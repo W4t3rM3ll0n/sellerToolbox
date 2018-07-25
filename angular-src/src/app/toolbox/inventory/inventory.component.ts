@@ -34,13 +34,6 @@ export class InventoryComponent implements OnInit, OnDestroy {
           this.user = user;
         },
         err => console.log(err));
-    
-    this.toolboxService.defaultUpdates()
-      .subscribe((updates) => {
-        console.log(updates);
-      },
-      err => console.log(err));
-
     // Getting the products from the database.
     this.toolboxService.getProducts()
       .subscribe((inventory) => {
@@ -127,6 +120,14 @@ export class InventoryComponent implements OnInit, OnDestroy {
         }
       });
     }
+  }
+
+  onSyncInventory() {
+    this.toolboxService.defaultUpdates()
+      .subscribe((updates) => {
+        console.log(updates);
+      },
+      err => console.log(err));
   }
 
   onEditItems() {

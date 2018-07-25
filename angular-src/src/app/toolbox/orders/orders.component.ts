@@ -24,12 +24,12 @@ export class OrdersComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.resetToDefault();
     this.toolboxService.getOrdersByStatus(this.orderFilter)
       .subscribe((orders) => {
         this.orders = orders;
         // console.log(orders);
-      },
-      err => console.log(err));
+      });
   }
 
   onSearchOrders(form: NgForm) {
@@ -159,10 +159,8 @@ export class OrdersComponent implements OnInit {
             .subscribe((updated) => {
               // console.log(updated);
               this.ngOnInit();
-            },
-            err => console.log(err));
-        },
-        err => console.log(err));
+            });
+        });
     }
   }
 

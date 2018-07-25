@@ -7,9 +7,9 @@ module.exports = {
 
     // Default updates for items such as pending orders, available quanity, etc...
     defaultUpdates(userId, callback) {
-
         // ***Change this to a reduce function in the future for better performance***
         const updateOrdersToLinkedProducts = new Promise((resolve, reject) => {
+            let updateAvailableQty = 0;
             // Find all products associated with the user.
             Products.find({ userId: userId })
                 .then((products) => {
@@ -18,26 +18,47 @@ module.exports = {
                         // Update the needed quantity.
                         product.quantity.neededQuantity = product.quantity.alertQuantity - product.quantity.quantity > 0 ? product.quantity.alertQuantity - product.quantity.quantity : 0;
                         // Loop through the linked items from the respected marketplace.
-                        product.linked.woocommerce.forEach((item) => {
+                        product.linked.woocommerce.forEach((linkedItem) => {
                             // Find the orders that matched the linked item based on its sku.
-                            Orders.find( { orderItems: { $elemMatch: { sku: item.sku } } } )
+                            Orders.find( { orderItems: { $elemMatch: { sku: linkedItem.sku } } } )
                                 .then(order => {
                                     // Loop through each order that were found. Each order is found based on the linked items inside the Product model.
-                                    order.forEach((each) => {
+                                    order.forEach((eachOrder) => {
                                         // Map each orders marketplaceID that lives in the Product model. Check to see if the orderID matches with each order response.
-                                        const pendingOrdersIndex = product.orders.map(eachProductOrders => eachProductOrders.marketplaceID).indexOf(each.marketplaceID);
+                                        const pendingOrdersIndex = product.orders.map(eachProductOrders => eachProductOrders.marketplaceID).indexOf(eachOrder.marketplaceID);
                                         // product.orders = []; // This clears the array of orders inside a product.
-                                        // console.log(product.orders.length);
                                         // If the order does not exist within the product and if the status is not completed, then we push each order.
-                                        if(pendingOrdersIndex < 0 && each.status !== 'completed') {
+                                        if(pendingOrdersIndex < 0 && eachOrder.status !== 'completed') {
                                             // Push the order to the orders section in the Product model.
-                                            product.orders.push(each);
+                                            product.orders.push(eachOrder);
+                                            // console.log(product.orders.length);
                                             // Update the pendingOrders quantity by specifying the found orders length.
-                                            product.quantity.pendingOrders = order.length;
-                                            // Update the availableQuantity.
-                                            product.quantity.availableQuantity = product.quantity.quantity - product.quantity.pendingOrders;
+                                            product.quantity.pendingOrders = product.orders.length;
                                         } else reject('Order is already matched with product'); // Reject if the order already exists within the orders array in the Product model.
+
+                                        // Loop through each order to get the order's item sku.
+                                        // Use this to push the orderItems quantity and resolve it in a different promise.
+                                        // product.orders.forEach(productOrder => {
+                                        //     productOrder.orderItems.forEach(orderItem => {
+                                        //         if(orderItem.sku === linkedItem.sku) {
+                                        //             updateAvailableQty += orderItem.quantity;
+                                        //         } else return false;
+                                        //     });
+                                        // });
+
+                                        eachOrder.orderItems.forEach(orderItem => {
+                                            // If the order item is a linked item then add the quantity of that purchased item to updateAvailableQty
+                                            if(orderItem.sku === linkedItem.sku) {
+                                                updateAvailableQty += orderItem.quantity;
+                                            } else return false;
+                                        });
+
                                     });
+                                    // Update the availableQuantity.
+                                    console.log(updateAvailableQty);
+                                    // if(updateAvailableQty > 0) {
+                                        product.quantity.availableQuantity = (product.quantity.quantity - updateAvailableQty);
+                                    // } else product.quantity.availableQuantity = product.quantity.quantity;
                                     // Save the changes/updates to the DB.
                                     product.save();
                                     // Resolve the orders that have been pushed to the orders array in the Product model.
@@ -101,7 +122,7 @@ module.exports = {
                         title: product.title,
                         quantity: {
                             quantity: product.quantity.quantity,
-                            availableQuantity: product.quantity.quantity - product.quantity.pendingOrders,
+                            availableQuantity: product.quantity.availableQuantity,
                             alertQuantity: product.quantity.alertQuantity,
                             pendingOrders: product.quantity.pendingOrders,
                             neededQuantity: product.quantity.alertQuantity - product.quantity.quantity > 0 ? product.quantity.alertQuantity - product.quantity.quantity : 0

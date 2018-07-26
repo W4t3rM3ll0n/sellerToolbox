@@ -125,13 +125,13 @@ module.exports = {
                                 } else { eachItemFlag++ };
                             } else {
                                 eachItemFlag++
-                                console.log('Product not found')
+                                // console.log('Product not found');
                             };
 
                             // console.log(totalItem);
                             // console.log(eachItemFlag);
                             if(totalItem === eachItemFlag) {
-                                console.log('getProductsAndInfo Completed');
+                                // console.log('getProductsAndInfo Completed');
                                 resolve();
                             };
                         })
@@ -153,6 +153,7 @@ module.exports = {
                         if(item.sku === foundProduct.sku) {
                             updateQty += item.quantity;
                         }
+
                         completeLoopFlag++
                         if(completeLoopFlag === updateInfo.length) {
                             completePromise = true;
@@ -174,7 +175,7 @@ module.exports = {
                         // console.log(foundProduct);
                         Products.update({ _id: foundProduct._id }, foundProduct)
                             .then(() => {
-                                console.log('updateProducts Completed');
+                                // console.log('updateProducts Completed');
                                 resolve();
                             })
                         .catch(err => reject(err));
@@ -204,7 +205,7 @@ module.exports = {
                             foundProduct.quantity.pendingOrders = foundProduct.orders.length;
                             Products.update({sku: foundProduct.sku}, foundProduct)
                                 .then(() => {
-                                    console.log('removeOrdersFromProduct Completed');
+                                    // console.log('removeOrdersFromProduct Completed');
                                     resolve();
                                 })
                             .catch(err => reject(err));
@@ -242,7 +243,7 @@ module.exports = {
                             foundProduct.quantity.pendingOrders = foundProduct.orders.length;
                             Products.update({sku: foundProduct.sku}, foundProduct)
                                 .then(() => {
-                                    console.log('addOrdersToProduct Completed');
+                                    // console.log('addOrdersToProduct Completed');
                                     resolve();
                                 })
                             .catch(err => reject(err));
@@ -252,15 +253,18 @@ module.exports = {
             });
         }
 
+        // This is the order the promises are executed in.
         getProductsAndInfo.then(() => {
-                return updateProducts();
+                if(foundProducts.length > 0) {
+                    return updateProducts();
+                } else return false;
             })
             .then(() => {
-                if(options === 'completed') {
+                if(options === 'completed' && foundProducts.length > 0) {
                     return removeOrdersFromProduct();
-                } else if(options !== 'completed') {
+                } else if(options !== 'completed' && foundProducts.length > 0) {
                     return addOrdersToProduct();
-                }
+                } else return false;
             })
             .then(() => {
                 callback(null, 'done');

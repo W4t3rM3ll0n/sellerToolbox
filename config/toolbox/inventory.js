@@ -7,60 +7,70 @@ module.exports = {
     // Default updates for items such as pending orders, available quantity, etc...
     syncInventory: async (userId) => {
 
-        // Get the user's products
-        const products = await Products.find({ userId }).exec();
+        try {
+            // Get the user's products
+            const products = await Products.find({ userId }).exec();
 
-        // Loop through each product
-        for(const product of products) {
-            // Get the `_id`, `alertQuantity` and `quantity` for the product
-            const { _id, quantity: { alertQuantity, quantity } } = product;
-
-            // Set the needed quantity for the item (minimum value of 0)
-            product.quantity.neededQuantity = Math.max(alertQuantity - quantity, 0);
-
-            // Loop through each linked item
-            for(const item of product.linked.woocommerce) {
-                // Track stock to reduce
-                let reduce = 0;
-
-                // Get all orders for the item
-                const orders = await Orders.find({
-                    orderItems: {
-                        $elemMatch: {
-                            sku: item.sku
+            // Async IIFE to process products
+            await (async function processProducts() {
+                // Loop through each product
+                for(const product of products) {
+                    // Get the `_id`, `alertQuantity` and `quantity` for the product
+                    const { _id, quantity: { alertQuantity, quantity } } = product;
+    
+                    // Set the needed quantity for the item (minimum value of 0)
+                    product.quantity.neededQuantity = Math.max(alertQuantity - quantity, 0);
+    
+                    // Loop through each linked item
+                    for(const item of product.linked.woocommerce) {
+                        // Track stock to reduce
+                        let reduce = 0;
+    
+                        // Get all orders for the item
+                        const orders = await Orders.find({
+                            orderItems: {
+                                $elemMatch: {
+                                    sku: item.sku
+                                }
+                            }
+                        }).exec();
+    
+                        // Loop through each order
+                        for(const order of orders) {
+                            // Attempt to find a pending order
+                            const pending = product.orders.find(x => x.marketplaceID === order.marketplaceID);
+    
+                            // If the order is pending and does not already exist in product.orders
+                            if(order.status !== 'completed' && pending === undefined) {
+                                // Update product.orders []
+                                product.orders.push(order);
+                            }
+                            // Update pending orders count
+                            product.quantity.pendingOrders = product.orders.length;
+    
+                            // Loop through each item in the order
+                            for(const orderItem of order.orderItems) {
+                                // If the order item is a linked item
+                                if(order.status !== 'completed' && orderItem.sku === item.sku) {
+                                    // Update the reduce stock
+                                    reduce += orderItem.quantity;
+                                }
+                            }
                         }
+                        // Update available stock on the product model
+                        product.quantity.availableQuantity = quantity - reduce;
                     }
-                }).exec();
-
-                // Loop through each order
-                for(const order of orders) {
-                    // Attempt to find a pending order
-                    const pending = product.orders.find(x => x.marketplaceID === order.marketplaceID);
-
-                    // If the order is pending and does not already exist in product.orders
-                    if(order.status !== 'completed' && pending === undefined) {
-                        // Update pending order
-                        product.orders.push(order);
-                    }
-                    product.quantity.pendingOrders = product.orders.length;
-
-                    // Loop through each item in the order
-                    for(const orderItem of order.orderItems) {
-                        // If the order item is a linked item
-                        if(order.status !== 'completed' && orderItem.sku === item.sku) {
-                            // Update the reduce stock
-                            reduce += orderItem.quantity;
-                        }
-                    }
+                    // Update DB
+                    await Products.update({ _id }, product).exec();
                 }
-                // Update available stock on the product model
-                product.quantity.availableQuantity = quantity - reduce;
-        
-                // Update DB
-                await Products.update({ _id }, product).exec();
-                return 'completed';
-            }
-        }        
+            }())
+
+            return 'Sync Inventory Completed';
+
+        } catch(err) {
+            throw `Error: ${err.name} - ${err.message}`;
+        }
+
     },
 
     addProducts: (productsQuery, callback) => {

@@ -5,7 +5,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
 
-const configInventory = require('../../config/toolbox/inventory');
+const inventory = require('../../config/toolbox/inventory');
 
 // Main Page
 router.get('/', (req, res) => {
@@ -16,12 +16,9 @@ router.get('/', (req, res) => {
 router.get('/syncInventory', passport.authenticate('jwt', { session:false }), async (req, res) => {
     const id = req.user._id;
 
-    try {
-        const updates = await configInventory.syncInventory(id);
-        res.json({ updates });
-    } catch(error) {
-        res.json({ error });
-    }
+    await inventory.syncInventory(id).then((success) => {
+        res.json({ success })
+    }).catch(error => res.json({ error }))
 
 });
 
@@ -38,7 +35,7 @@ router.put('/createProducts', passport.authenticate('jwt', { session:false }), (
     }
     // console.log(products);
     
-    configInventory.addProducts(products, (err, response) => {
+    inventory.addProducts(products, (err, response) => {
         err ? res.json({error: err}) : res.json(response);
     });
 
@@ -54,7 +51,7 @@ router.post('/updateProducts', passport.authenticate('jwt', { session:false }), 
     const userId = req.user._id;
     // console.log(products);
 
-    configInventory.updateProducts(products, userId, (err, response) => {
+    inventory.updateProducts(products, userId, (err, response) => {
         err ? res.json({error: err}) : res.json(response);
     });
 
@@ -65,7 +62,7 @@ router.get('/getProducts', passport.authenticate('jwt', {session: false}), (req,
     // Search products collection with the user id.
     const userId = req.user._id;
 
-    configInventory.getProducts(userId, (err, products) => {
+    inventory.getProducts(userId, (err, products) => {
         err ? res.json({error: err}) : res.json(products);
     });
 
@@ -78,7 +75,7 @@ router.post('/deleteProducts', passport.authenticate('jwt', {session: false}), (
     // userId is just used for double verification.
     const userId = req.user._id;
 
-    configInventory.deleteProducts(products, userId, (err, deleted) => {
+    inventory.deleteProducts(products, userId, (err, deleted) => {
         err ? res.json({error: err}) : res.json(deleted);
     });
 
@@ -91,7 +88,7 @@ router.post('/linkItems', passport.authenticate('jwt', {session: false}), (req, 
     // userId is just used for double verification.
     const userId = req.user._id;
 
-    configInventory.linkItems(toolboxItem, marketplaceItem, userId, (err, linked) => {
+    inventory.linkItems(toolboxItem, marketplaceItem, userId, (err, linked) => {
         err ? res.json({error: err}) : res.json(linked);
     });
 });

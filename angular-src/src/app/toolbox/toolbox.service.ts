@@ -32,13 +32,13 @@ export class ToolboxService {
     //         )
     // }
 
-    defaultUpdates() {
+    syncInventory() {
         let headers = new Headers();
         this.loadToken();
         headers.append('Authorization', this.jwtToken);
         headers.append('Content-Type', 'application/json');
         this.jwtToken = null;
-        return this.http.get('http://localhost:3000/toolbox/inventory/defaultUpdates', { headers: headers })
+        return this.http.get('http://localhost:3000/toolbox/inventory/syncInventory', { headers: headers })
             .pipe(
                 map(updates => updates.json())
             )  

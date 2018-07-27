@@ -92,6 +92,7 @@ module.exports = {
         const foundProducts = [];
         const updateInfo = [];
 
+        // (1)
         const getProductsAndInfo = new Promise((resolve, reject) => {
             // This flag adds 1 each time a item whether it is linked or not is processed.
             let eachItemFlag = 0;
@@ -141,6 +142,7 @@ module.exports = {
             });
         });
 
+        // (2)
         const updateProducts = () => {
             return new Promise((resolve, reject) => {
                 let completePromise = false;
@@ -184,6 +186,7 @@ module.exports = {
             });
         }
 
+        // (3)
         const removeOrdersFromProduct = () => {
             return new Promise((resolve, reject) => {
                 // Loop through the foundProducts []. Contains found product at the current state in database.
@@ -215,6 +218,7 @@ module.exports = {
             });
         }
 
+        // (4)
         function addOrdersToProduct() {
             return new Promise((resolve, reject) => {
                 // Loop through the foundProducts []. Contains found product at the current state in database.
@@ -254,22 +258,26 @@ module.exports = {
         }
 
         // This is the order the promises are executed in.
+        // (1)
         getProductsAndInfo.then(() => {
                 if(foundProducts.length > 0) {
+                    // (2)
                     return updateProducts();
                 } else return false;
             })
             .then(() => {
                 if(options === 'completed' && foundProducts.length > 0) {
+                    // (3)
                     return removeOrdersFromProduct();
                 } else if(options !== 'completed' && foundProducts.length > 0) {
+                    // (4)
                     return addOrdersToProduct();
                 } else return false;
             })
             .then(() => {
                 callback(null, 'done');
             })
-        .catch(err => console.log(err));
+        .catch(err => callback(err, null));
 
     },
 

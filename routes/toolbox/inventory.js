@@ -14,10 +14,10 @@ router.get('/', (req, res) => {
 });
 
 // Default updates for inventory - updates sections such as pending orders and available quantity.
-router.get('/defaultUpdates', passport.authenticate('jwt', { session:false }), (req, res) => {
+router.get('/syncInventory', passport.authenticate('jwt', { session:false }), (req, res) => {
     const userId = req.user._id;
 
-    configInventory.defaultUpdates(userId, (err, updates) => {
+    configInventory.syncInventory(userId, (err, updates) => {
         err ? res.json({error: err}) : res.json({updates: updates});
     });
 });

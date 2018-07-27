@@ -123,7 +123,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
   }
 
   onSyncInventory() {
-    this.toolboxService.defaultUpdates()
+    this.toolboxService.syncInventory()
       .subscribe((updates) => {
         console.log(updates);
       },

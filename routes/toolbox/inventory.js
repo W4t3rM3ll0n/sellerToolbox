@@ -1,5 +1,4 @@
 'use strict'
-
 const express = require('express');
 const router = express.Router();
 
@@ -14,12 +13,20 @@ router.get('/', (req, res) => {
 });
 
 // Default updates for inventory - updates sections such as pending orders and available quantity.
-router.get('/syncInventory', passport.authenticate('jwt', { session:false }), (req, res) => {
-    const userId = req.user._id;
+router.get('/syncInventory', passport.authenticate('jwt', { session:false }), async (req, res) => {
+    const id = req.user._id;
 
-    configInventory.syncInventory(userId, (err, updates) => {
-        err ? res.json({error: err}) : res.json({updates: updates});
-    });
+    try {
+        const updates = await configInventory.syncInventory(id);
+        res.json({ updates });
+    } catch(error) {
+        res.json({ error });
+    }
+
+    // configInventory.syncInventory(userId, (err, updates) => {
+    //     err ? res.json({error: err}) : res.json({updates: updates});
+    // });
+
 });
 
 // Create Products

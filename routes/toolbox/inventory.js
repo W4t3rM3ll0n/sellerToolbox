@@ -23,10 +23,6 @@ router.get('/syncInventory', passport.authenticate('jwt', { session:false }), as
         res.json({ error });
     }
 
-    // configInventory.syncInventory(userId, (err, updates) => {
-    //     err ? res.json({error: err}) : res.json({updates: updates});
-    // });
-
 });
 
 // Create Products

@@ -87,197 +87,72 @@ module.exports = {
 
     },
 
-    updateOrders(orders, options, userId, callback) {
+    updateOrders: async (orders, options, userId) => {
 
-        const foundProducts = [];
-        const updateInfo = [];
+        // Loop through the orders passed in
+        for(const order of orders) {
+            // Get `marketplaceID` for order
+            const { marketplaceID } = order;
+    
+            // Look through each orderItem
+            for(const orderItem of order.orderItems) {
+                // Get `product_id`, `quantity` for orderItem
+                const { product_id, quantity } = orderItem;
 
-        // (1)
-        const getProductsAndInfo = new Promise((resolve, reject) => {
-            // This flag adds 1 each time a item whether it is linked or not is processed.
-            let eachItemFlag = 0;
-            // This flag adds the amount each order has. // Item qty is void.
-            let totalItem = 0;
-            // Loop through the orders that are passed from the parameter.
-            orders.forEach(order => {
-                totalItem += order.orderItems.length;
-                order.orderItems.forEach(orderItem => {
-                    // Find each product by sku from the order items.
-                    Products.findOne({sku: orderItem.sku, userId: userId})
-                        .then(foundProduct => {
-                            if(foundProduct !== null) {
-                                // Check if the item in the database is linked.
-                                const linkedItemIndex = foundProduct.linked.woocommerce.map(linkedItem => {
-                                    return linkedItem.id;
-                                }).indexOf(orderItem.product_id);
-                                if(linkedItemIndex > -1) {
-                                    eachItemFlag++
-                                    // Get the index of the foundProduct compared to the foundProducts [].
-                                    const productIndex = foundProducts.map(product => {
-                                        return product.sku;
-                                    }).indexOf(foundProduct.sku);
-                                    // If the product that was found does not already exist in the foundProducts [].
-                                    if(productIndex < 0) {
-                                        // Push the products that were found in the database that also exist in the order.
-                                        foundProducts.push(foundProduct);
-                                    };
-                                    // console.log(orderItem);
-                                    updateInfo.push({ sku: orderItem.sku, quantity: orderItem.quantity, marketplaceID: order.marketplaceID });
-                                } else { eachItemFlag++ };
-                            } else {
-                                eachItemFlag++
-                                // console.log('Product not found');
-                            };
+                // Get products
+                const products = await Products.find({ sku: orderItem.sku, userId }).exec();
 
-                            // console.log(totalItem);
-                            // console.log(eachItemFlag);
-                            if(totalItem === eachItemFlag) {
-                                // console.log('getProductsAndInfo Completed');
-                                resolve();
-                            };
-                        })
-                    .catch(err => reject(err));
-                });
-                Orders.update({ _id: order._id, userId: userId }, { status: options }).then().catch(err => reject(err));
-            });
-        });
+                // Loop through each product
+                for(const product of products) {
+                    // Get `_id`, linked: `woocommerce` for product
+                    let { _id, linked: { woocommerce } } = product;
 
-        // (2)
-        const updateProducts = () => {
-            return new Promise((resolve, reject) => {
-                let completePromise = false;
-                let completeLoopFlag = 0;
-                // Loop through each product that was found.
-                foundProducts.forEach((foundProduct) => {
-                    let updateQty = 0;
-                    // Loop through the updateInfo to get the total update quantity based on each item.
-                    updateInfo.forEach(item => {
-                        if(item.sku === foundProduct.sku) {
-                            updateQty += item.quantity;
+                    // Check to see if the product is linked
+                    const linked = woocommerce.find(x => x.id === product_id);
+                    
+                    // If the product is linked
+                    if(linked) {
+
+                        if(options === 'completed') {
+                            // Subtract the product quantity with orderItem quantity
+                            product.quantity.quantity -= quantity;
+
+                            // Get the index of matching order in product.orders
+                            const orderIndex = product.orders.map(y => y.marketplaceID).indexOf(marketplaceID);
+
+                            if(orderIndex > -1) {
+                                // Remove the order from product.orders
+                                product.orders.splice(orderIndex, 1);
+                            }
+
+                        } 
+                        
+                        if(options !== 'completed') {
+                            // Add the product quantity with the orderItem quantity
+                            product.quantity.quantity += quantity;
+
+                            // Attempt to find order
+                            const findOrder = product.orders.find(y => y.marketplaceID === marketplaceID);
+
+                            // If order is not found in product.orders
+                            if(!findOrder) {
+                                // Add the order into the array
+                                product.orders.push(order);
+                            }
+
                         }
 
-                        completeLoopFlag++
-                        if(completeLoopFlag === updateInfo.length) {
-                            completePromise = true;
-                        }
-                    });
-
-                    // Update the quantity.
-                    if(options === 'completed') {
-                        // foundProduct.orders = [];
-                        foundProduct.quantity.quantity -= updateQty;
-                        // foundProduct.save();
-                    } else if(options !== 'completed') {
-                        // foundProduct.orders = [];
-                        foundProduct.quantity.quantity += updateQty;
-                        // foundProduct.save();
                     }
 
-                    if(completePromise === true) {
-                        // console.log(foundProduct);
-                        Products.update({ _id: foundProduct._id }, foundProduct)
-                            .then(() => {
-                                // console.log('updateProducts Completed');
-                                resolve();
-                            })
-                        .catch(err => reject(err));
-                    }
-                });
-            });
+                    // Update product.quantity.pendingOrders
+                    product.quantity.pendingOrders = product.orders.length
+                    
+                    await Products.update({ _id }, product).exec();
+                }
+            }
+            // Update the status of each order
+            await Orders.update({ _id: order._id, userId: userId }, { status: options }).exec();
         }
-
-        // (3)
-        const removeOrdersFromProduct = () => {
-            return new Promise((resolve, reject) => {
-                // Loop through the foundProducts []. Contains found product at the current state in database.
-                foundProducts.forEach(foundProduct => {
-                    // Loop through the updateInfo []. Update info contains sku, qty & marketplaceID from current state of order.
-                    updateInfo.forEach((item, index, array) => {
-                        // If the foundProduct orders matches the updateInfo's item.marketplaceID the get the index.
-                        const orderItemIndex = foundProduct.orders.map(eachOrder => {
-                            return eachOrder.marketplaceID;
-                        }).indexOf(item.marketplaceID);
-                        // If its a match and the index is greater than 0 then splice the order out of foundProduct orders.
-                        if(orderItemIndex > -1 && options === 'completed') {
-                            foundProduct.orders.splice(orderItemIndex, 1);
-                        }
-
-                        if(index === array.length-1) {
-                            // After the loop above is completed update the Products based on the resulted object of foundProduct.
-                            // console.log(foundProduct);
-                            foundProduct.quantity.pendingOrders = foundProduct.orders.length;
-                            Products.update({sku: foundProduct.sku}, foundProduct)
-                                .then(() => {
-                                    // console.log('removeOrdersFromProduct Completed');
-                                    resolve();
-                                })
-                            .catch(err => reject(err));
-                        }
-                    });
-                });
-            });
-        }
-
-        // (4)
-        function addOrdersToProduct() {
-            return new Promise((resolve, reject) => {
-                // Loop through the foundProducts []. Contains found product at the current state in database.
-                foundProducts.forEach(foundProduct => {
-                    // Loop through the updateInfo []. Update info contains sku, qty & marketplaceID from current state of order.
-                    updateInfo.forEach(item => {
-                        // Here we are going to update the Product when marked as processing or other order status. We need to push the orders into the Product.orders.
-                        Orders.findOne({ marketplaceID: item.marketplaceID }, (err, orderToBeUploaded) => {
-                            if(err) reject(err);
-                                // If during the loop the updateInfo sku is the same as the foundProduct sku .
-                                if(item.sku === foundProduct.sku) {
-                                    // Check to see if the order exists or not within the foundProduct.orders. We check with orderToBeUploaded.marketplaceID.
-                                    const orderIndex = foundProduct.orders.map(eachOrder => {
-                                        return eachOrder.marketplaceID;
-                                    }).indexOf(orderToBeUploaded.marketplaceID);
-        
-                                    // console.log(orderIndex);
-                                    // If the order does not exist within the orders object of the product, we push the orderToBeUploaded into orders.
-                                    if(orderIndex < 0) {
-                                        foundProduct.orders.push(orderToBeUploaded);
-                                    }
-                                }
-
-                            // After the loop above is completed update the Products based on the resulted object of foundProduct.
-                            // console.log(foundProduct);
-                            foundProduct.quantity.pendingOrders = foundProduct.orders.length;
-                            Products.update({sku: foundProduct.sku}, foundProduct)
-                                .then(() => {
-                                    // console.log('addOrdersToProduct Completed');
-                                    resolve();
-                                })
-                            .catch(err => reject(err));
-                        });
-                    });
-                });
-            });
-        }
-
-        // This is the order the promises are executed in.
-        // (1)
-        getProductsAndInfo.then(() => {
-                if(foundProducts.length > 0) {
-                    // (2)
-                    return updateProducts();
-                } else return false;
-            })
-            .then(() => {
-                if(options === 'completed' && foundProducts.length > 0) {
-                    // (3)
-                    return removeOrdersFromProduct();
-                } else if(options !== 'completed' && foundProducts.length > 0) {
-                    // (4)
-                    return addOrdersToProduct();
-                } else return false;
-            })
-            .then(() => {
-                callback(null, 'done');
-            })
-        .catch(err => callback(err, null));
 
     },
 

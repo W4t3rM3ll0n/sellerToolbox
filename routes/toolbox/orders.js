@@ -18,14 +18,15 @@ router.post('/saveOrders', passport.authenticate('jwt', { session:false }), (req
     });
 });
 
-router.post('/updateOrders', passport.authenticate('jwt', { session:false }), (req, res) => {
+router.post('/updateOrders', passport.authenticate('jwt', { session:false }), async (req, res) => {
     const orders = req.body.orders;
     const options = req.body.options;
     const userId = req.user._id;
 
-    configOrders.updateOrders(orders, options, userId, (err, updated) => {
-        err ? res.json({error: err}) : res.json({updated: updated});
-    });
+    await configOrders.updateOrders(orders, options, userId).then(success => {
+        res.json({ success: 'Orders have been updated' });
+    }).catch(error => { res.json({ error: 'You have an error updating the orders' })});
+
 });
 
 // Route deleteSingleOrder && deleteMultiOrder - Merge into one route.

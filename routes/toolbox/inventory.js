@@ -17,8 +17,8 @@ router.get('/syncInventory', passport.authenticate('jwt', { session:false }), as
     const id = req.user._id;
 
     await inventory.syncInventory(id).then((success) => {
-        res.json({ success })
-    }).catch(error => res.json({ error }))
+        res.json({ success: 'Inventory has been synced' })
+    }).catch(error => res.json({ error: 'You have an error syncing the inventory' }));
 
 });
 

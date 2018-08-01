@@ -13,8 +13,8 @@ const app = express();
 
 // Connect to MongoDB
 mongoose.connect(configDB.getDbConnectionString().database, err => 
-    err ? console.error(err) : console.log('Connected To MongoDB'));
-    
+  err ? console.error(err) : console.log('Connected To MongoDB'));
+  
 // Cors MW
 app.use(cors());
 
@@ -34,7 +34,7 @@ configPassport.jwtStrat(passport);
 const users = require('./routes/users');
 const inventory = require('./routes/toolbox/inventory');
 const orders = require('./routes/toolbox/orders');
-const ebay = require('./routes/ebay');
+const ebay = require('./routes/marketplaces/ebay');
 const woocommerce = require('./routes/marketPlaces/woocommerce');
 
 app.use('/users', users);
@@ -44,17 +44,17 @@ app.use('/ebay', ebay);
 app.use('/woocommerce', woocommerce);
 
 app.get('/', (req, res) => {
-    res.send('Invalid Endpoint');
+  res.send('Invalid Endpoint');
 });
 
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index.html'));
+  res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 // Listen on Port
 const port = process.env.PORT || 3000;
 app.listen(port, (err) => 
-    err ? console.error(err) : console.log(`Server started on port: ${port}`));
+  err ? console.error(err) : console.log(`Server started on port: ${port}`));
 
 
 // /*** HTTPS Development Env ***/

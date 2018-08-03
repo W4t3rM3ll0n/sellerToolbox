@@ -128,4 +128,17 @@ export class AuthService {
     localStorage.clear();
   }
 
+  getPitneyBowesAuth() {
+    let headers = new Headers();
+    this.loadToken();
+    headers.append('Authorization', this.jwtToken);
+    headers.append('Content-Type', 'application/json');
+    console.log(headers);
+    this.jwtToken = null;
+    return this.http.get('http://localhost:3000/shipping/pitneyBowes', { headers: headers })
+      .pipe(
+        map(success => success.json())
+      )
+  }
+
 }

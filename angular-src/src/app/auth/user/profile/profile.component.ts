@@ -195,4 +195,12 @@ export class ProfileComponent implements OnInit {
         )
     }
   }
+
+  onAuthPitneyBowes() {
+    this.authService.getPitneyBowesAuth()
+      .subscribe((success) => {
+        console.log(success);
+      })
+  }
+
 }

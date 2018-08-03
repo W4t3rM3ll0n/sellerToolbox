@@ -45,13 +45,17 @@ const usersSchema = new Schema({
             fullAddress: String
         }]
     },
-    ebayauthtoken: {
-        type: String,
-        required: false
-    },
-    ebayreftoken: {
-        type: String,
-        required: false
+    tokens: {
+        ebayauthtoken: {
+            type: String,
+            required: false
+        },
+        ebayreftoken: {
+            type: String,
+            required: false
+        },
+        pitneyBowesAuthToken: String
+
     }
 });
 

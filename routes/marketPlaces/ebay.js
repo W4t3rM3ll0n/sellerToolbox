@@ -12,7 +12,7 @@ router.get('/', (req, res, next) => {
 });
 
 // Ebay Tokens To Client
-router.get('/tokens', passport.authenticate('jwt', { session:false }), (req, res, next) => {
+router.get('/tokens', passport.authenticate('jwt', { session: false }), (req, res, next) => {
   res.json({
     authToken: req.user.ebayauthtoken,
     refToken: req.user.ebayreftoken

@@ -2,8 +2,57 @@
 
 const http = require('http');
 const https = require('https');
+const querystring = require('querystring');
 
 module.exports = {
+
+  httpOptions: (host, port, path, method, headers) => {
+    return {
+      host: host, // api-sandbox.pitneybowes.com
+      port: port,
+      path: path,
+      method: method,
+      headers: headers
+    };
+  },
+
+  postData: (data) => {
+    return querystring.stringify(data)
+  },
+
+  retrieve: (options, postData, result) => {
+
+    const port = options.port === 443 ? https : http;
+
+    const req = port.request(options, (res) => {
+      let output = '';
+
+      res.setEncoding('utf8');
+
+      // res.once('data', (chunk) => {
+      //   console.log('json request chunk is good');
+      // });
+
+      res.on('data', (chunk) => {
+        output += chunk;
+      });
+
+      res.on('end', () => {
+        result(null, JSON.parse(output));
+      });
+      
+    });
+
+    req.on('error', (err) => {
+      result(err, null);
+    });
+    
+    if(postData !== '') {
+      req.write(postData);
+    }
+    req.end();
+
+  },
 
   // HTTP Request
   getJSON: (options, res, onResult) => {
@@ -39,9 +88,9 @@ module.exports = {
 
   // HTTP Request
   postJSON: (options, postData, res, onResult) => {
-    var port = options.port === 443 ? https : http;
-    var req = port.request(options, (res) => {
-      var output = '';
+    const port = options.port === 443 ? https : http;
+    const req = port.request(options, (res) => {
+      let output = '';
       // console.log('Response from server started');
       // console.log(`Server Status: ${res.statusCode}`);
       // console.log('Response Headers: %j', res.headers);
@@ -56,7 +105,7 @@ module.exports = {
       });
   
       res.on('end', () => {
-        var obj = JSON.parse(output);
+        const obj = JSON.parse(output);
         onResult(res.statusCode, obj);
         // console.log(output);
       });
@@ -70,5 +119,9 @@ module.exports = {
     req.write(postData);
     req.end();
   },
+
+  // post: (options, (res) => {
+
+  // })
 
 }

@@ -112,7 +112,7 @@
           </td>
           <td class="align-middle" *ngIf="user">
             <select class="form-control-sm" formControlName="location">
-              <option *ngFor="let address of user.addresses" [ngValue]="address.fullAddress">{{ address.fullAddress }}</option>
+              <option *ngFor="let address of user.addresses" [ngValue]="address">{{ address.fullAddress }}</option>
             </select>
           </td>
           <td formGroupName="detail">

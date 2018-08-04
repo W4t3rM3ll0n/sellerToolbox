@@ -22,13 +22,17 @@ export class InventoryGroupRow {
     images: string;
     condition: string;
     location: {
-        address: {
-            address1: string;
-            address2: string;
-            city: string;
-            state: string;
-            zip: number
-        }
+        fullAddress: String,
+        company: String,
+        name: String,
+        address1: String,
+        address2: String,
+        city: String,
+        state: String,
+        zip: String,
+        country: String,
+        email: String,
+        phone: String
     };
     detail: {
         weight: number;

@@ -77,9 +77,9 @@ router.post('/printOrders', passport.authenticate('jwt', { session: false }), as
   // const auth = req.user.tokens.pitneyBowesAuthToken;
   const user = req.user;
 
-  await configOrders.printOrders(orders, user).then((success) => {
+  await configOrders.createOrderLabels(orders, user).then((success) => {
     res.json({ success });
-  }).catch(error => res.json({ error }));
+  }).catch(error => res.json({ error: error.message }));
   
 });
 

@@ -70,6 +70,8 @@ module.exports = {
     const createProducts = () => {
       return new Promise((resolve, reject) => {
 
+        // console.log(productsQuery);
+
         productsQuery.forEach((product) => {
           created.push(product);
           const createProducts = Products(product);
@@ -99,6 +101,7 @@ module.exports = {
     const updateProducts = () => {
       return new Promise((resolve, reject) => {
         productsQuery.forEach((product) => {
+          console.log(product.location);
           updated.push(product);
           const update = {
             sku: product.sku,
@@ -122,7 +125,19 @@ module.exports = {
             barcode: product.barcode,
             images: product.images,
             condition: product.condition,
-            location: product.location,
+            location: {
+              fullAddress: product.location.fullAddress,
+              company: product.location.company,
+              name: product.location.name,
+              address1: product.location.address1,
+              address2: product.location.address2,
+              city: product.location.city,
+              state: product.location.state,
+              zip: product.location.zip,
+              country: product.location.country,
+              email: product.location.email,
+              phone: product.location.phone
+            },
             detail: {
               weight: product.detail.weight,
               height: product.detail.height,

@@ -32,7 +32,19 @@ const productsSchema = new Schema({
     },
     category: String,
     variationGroup: String,
-    location: String,
+    location: {
+        fullAddress: String,
+        company: String,
+        name: String,
+        address1: String,
+        address2: String,
+        city: String,
+        state: String,
+        zip: String,
+        country: String,
+        email: String,
+        phone: String
+    },
     detail: {
         weight: Number,
         height: Number,

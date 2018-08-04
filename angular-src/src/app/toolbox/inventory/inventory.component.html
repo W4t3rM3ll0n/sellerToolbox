@@ -108,7 +108,7 @@
               <span>{{ product.condition }}</span>
             </td>
             <td class="align-middle">
-              <span>{{ product.location }}</span>
+              <span>{{ product.location.fullAddress }}</span>
             </td>
             <td class="align-middle">
               <span>{{ product.detail.weight }}</span>
@@ -243,7 +243,7 @@
             </td>
             <td class="align-middle">
               <select class="form-control-sm" formControlName="location">
-                <option *ngFor="let address of user.addresses" [ngValue]="address.fullAddress">{{ address.fullAddress }}</option>
+                <option *ngFor="let address of user.addresses" [ngValue]="address">{{ address.fullAddress }}</option>
               </select>
             </td>
             <td class="align-middle" formGroupName="detail">

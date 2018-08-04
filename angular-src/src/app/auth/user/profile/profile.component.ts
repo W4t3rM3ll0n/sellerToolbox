@@ -86,12 +86,14 @@ export class ProfileComponent implements OnInit {
             const dataValues: any = { // Change this type later.
               'id': [address._id],
               'fullAddress': [address.fullAddress],
+              'company': [address.company],
               'name': [address.name],
               'address1': [address.address1],
               'address2': [address.address2],
               'city': [address.city],
               'state': [address.state],
               'zip': [address.zip],
+              'country': [address.country],
               'primary': [address.primary]
             }
 

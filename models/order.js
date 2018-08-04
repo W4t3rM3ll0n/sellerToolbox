@@ -22,6 +22,7 @@ const ordersSchema = new Schema({
     marketplace: String,
     billing: address,
     shipping: address,
+    shipFrom: address,
     orderItems: [],
     currency: String,
     total: Number,

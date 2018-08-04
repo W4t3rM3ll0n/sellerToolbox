@@ -75,6 +75,18 @@ export class InventoryComponent implements OnInit, OnDestroy {
         'barcode': [{value: item.barcode, disabled: true}],
         'condition': [{value: item.condition, disabled: true}],
         'location': [{value: item.location, disabled: true}],
+        //   'fullAddress': [{value: item.location.fullAddress, disabled: true}],
+        //   'company': [{value: item.location.company, disabled: true}],
+        //   'name': [{value: item.location.name, disabled: true}],
+        //   'address1': [{value: item.location.address1, disabled: true}],
+        //   'address2': [{value: item.location.address2, disabled: true}],
+        //   'city': [{value: item.location.city, disabled: true}],
+        //   'state': [{value: item.location.state, disabled: true}],
+        //   'zip': [{value: item.location.zip, disabled: true}],
+        //   'country': [{value: item.location.country, disabled: true}],
+        //   'email': [{value: item.location.email, disabled: true}],
+        //   'phone': [{value: item.location.phone, disabled: true}]
+        // }),
         'detail': this._fb.group({
           'weight': [{value: item.detail.weight, disabled: true}],
           'height': [{value: item.detail.height, disabled: true}],

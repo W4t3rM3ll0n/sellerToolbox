@@ -23,6 +23,7 @@ const usersSchema = new Schema({
     },
     addresses: {
         type: [{
+            company: String,
             name: String,
             address1: {
                 type: String,
@@ -41,6 +42,7 @@ const usersSchema = new Schema({
                 type: String,
                 required: true
             },
+            country: String,
             primary: Boolean,
             fullAddress: String
         }]

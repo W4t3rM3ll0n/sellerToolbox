@@ -6,31 +6,6 @@ const Orders = require('../../models/order');
 const Products = require('../../models/products');
 const httpReq = require('../../config/httpReq');
 
-// Save files to pdf
-function printOrderLabels() {
-  // PDF creation
-  const pdf = new PDFKit({
-    size: 'LEGAL',
-    layout: 'portrait',
-    size: [288, 432] // 72 === 1 inch
-  });
-
-  pdf.image(`${__dirname}/testing1.png`, 0, 0, {
-    width: 288,
-    height: 432
-  });
-
-  pdf.addPage().image(`${__dirname}/testing2.png`, 0, 0, {
-    width: 288,
-    height: 432
-  });
-
-  pdf.end();
-
-  pdf.pipe(fs.createWriteStream(`${__dirname}/test1.pdf`));
-}
-
-
 module.exports = {
 
   // Get all orders from the database.
@@ -247,7 +222,7 @@ module.exports = {
         const print = httpReq.httpOptions('api-sandbox.pitneybowes.com', 443, '/shippingservices/v1/shipments?includeDeliveryCommitment=true', 'POST', {
           'Authorization': `Bearer  ${auth}`,
           'Content-Type': 'application/json',
-          'X-PB-TransactionId': `TEST080318-31-${i}`
+          'X-PB-TransactionId': `TEST080418-1-${i}`
         });
         
         // Print data
@@ -292,7 +267,7 @@ module.exports = {
           },
           "rates": [ {
               "carrier": "USPS",
-              "serviceId": "PM",
+              "serviceId": "FCM",
               "parcelType": "PKG",
               "specialServices": [ {
                   "specialServiceId": "DelCon",
@@ -323,7 +298,7 @@ module.exports = {
         });
 
         // Get print label
-        await httpReq.retrieve(print, printData, (err, label) => {
+        await httpReq.retrieve(print, printData, async (err, label) => {
           if(err) throw err;
 
           const image = label.documents[0].pages[0].contents;
@@ -333,24 +308,45 @@ module.exports = {
             console.log(err);
           });
           i++;
-          // if(i === orders.length - 1) {
-          //   console.log('working');
-            // printOrderLabels();
-          // }
+          await i === orders.length;
         });
+
       });
     }
 
   },
 
+  // Save files to pdf
+  printOrderLabels: async () => {
+
+    // PDF creation
+    const pdf = new PDFKit({
+      size: 'LEGAL',
+      layout: 'portrait',
+      size: [288, 432] // 72 === 1 inch
+    });
+
+    pdf.image(`${__dirname}/testing1.png`, 0, 0, {
+      width: 288,
+      height: 432
+    });
+
+    pdf.addPage().image(`${__dirname}/testing2.png`, 0, 0, {
+      width: 288,
+      height: 432
+    });
+    pdf.addPage().image(`${__dirname}/testing3.png`, 0, 0, {
+      width: 288,
+      height: 432
+    });
+    pdf.addPage().image(`${__dirname}/testing4.png`, 0, 0, {
+      width: 288,
+      height: 432
+    });
+
+    pdf.end();
+
+    pdf.pipe(fs.createWriteStream(`${__dirname}/test1.pdf`));
+  }
+
 }
-
-/***** Retreive merchant info *****/
-// const merchants = httpReq.httpOptions('api-sandbox.pitneybowes.com', 443, '/shippingservices/v1/developers/58018991/merchants', 'GET', {
-//   'Authorization': `Bearer  ${auth}`
-// });
-
-// await httpReq.retrieve(merchants, '', async (err, test) => {
-//   if(err) console.log(err);
-//   await console.log(test);
-// })

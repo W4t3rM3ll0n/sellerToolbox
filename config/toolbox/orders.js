@@ -1,6 +1,7 @@
 'use strict'
 const PDFKit = require('pdfkit');
 const fs = require('fs');
+require('dotenv').config();
 
 const Orders = require('../../models/order');
 const Products = require('../../models/products');
@@ -287,7 +288,7 @@ module.exports = {
           } ],
           "shipmentOptions": [ {
               "name": "SHIPPER_ID",
-              "value": 9015330830
+              "value": process.env.PB_SHIPID
           }, {
               "name": "ADD_TO_MANIFEST",
               "value": "true"

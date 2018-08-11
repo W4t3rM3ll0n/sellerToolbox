@@ -65,3 +65,4 @@ package-lock.json
 plans.html
 /public
 sellerToolbox.txt
+.data/orders

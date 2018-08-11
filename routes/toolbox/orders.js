@@ -78,14 +78,12 @@ router.post('/printOrders', passport.authenticate('jwt', { session: false }), as
   const user = req.user;
 
   await configOrders.createOrderLabels(orders, user)
-    .then(() => {
-      return configOrders.printOrderLabels();
-    })
+  await configOrders.printOrderLabels()
     .then((success) => {
       res.json({ success });
     })
     .catch(error => res.json({ error: error.message }));
-  
+
 });
 
 module.exports = router;

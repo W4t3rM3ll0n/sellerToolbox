@@ -20,37 +20,32 @@ module.exports = {
     return querystring.stringify(data)
   },
 
-  retrieve: (options, postData, result) => {
+  retrieve: (options, postData) => {
 
-    const port = options.port === 443 ? https : http;
-
-    const req = port.request(options, (res) => {
-      let output = '';
-
-      res.setEncoding('utf8');
-
-      // res.once('data', (chunk) => {
-      //   console.log('json request chunk is good');
-      // });
-
-      res.on('data', (chunk) => {
-        output += chunk;
+    return new Promise((resolve, reject) => {
+      const port = options.port === 443 ? https : http;
+      const req = port.request(options, (res) => {
+        res.setEncoding('utf8');
+        let output = '';
+  
+        res.on('data', (chunk) => {
+          output += chunk;
+        });
+  
+        res.on('end', () => {
+          resolve(JSON.parse(output));
+        });
       });
-
-      res.on('end', () => {
-        result(null, JSON.parse(output));
+  
+      req.on('error', (err) => {
+        reject(err);
       });
       
+      if(postData !== '') {
+        req.write(postData);
+      }
+      req.end();
     });
-
-    req.on('error', (err) => {
-      result(err, null);
-    });
-    
-    if(postData !== '') {
-      req.write(postData);
-    }
-    req.end();
 
   },
 

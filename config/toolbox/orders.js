@@ -34,7 +34,6 @@ orders.saveOrders = async (orders, userId) => {
     for(const item of order.line_items) {
       // console.log(item.sku);
       const shipFrom = await Products.findOne({ sku: item.sku, userId: userId }).exec();
-      console.log(shipFrom.location);
       // If finds === 0, order does not exist in database
       if(finds.length === 0) {
         // Create the order object
@@ -194,8 +193,7 @@ const dateNow = Date.now();
 // Creating date in chosen format
 const date = new Date(), currMonth = date.getMonth()+1, currDate = date.getDate(), currYear = date.getFullYear();
 const fullDate = `${currMonth.toString()}-${currDate.toString()}-${currYear.toString()}`;
-
-// Flag for keep track of folders created for that day
+// Flag for keep track of folders created for that day, for functions orders `createOrderLabels` && `printOrderLabels`
 let today = 0;
 
 // Create Order Labels
@@ -203,44 +201,76 @@ orders.createOrderLabels = async (orders, user) => {
   // User pitney token
   const auth = user.tokens.pitneyBowesAuthToken;
 
+  // Create a folder to store processed orders
+  async function createFolder() {
+      // If todays date directory does not exist
+      if (!fs.existsSync(`${baseDir}/orders/${fullDate}`)) {
+        // Create directory
+        fs.mkdirSync(`${baseDir}/orders/${fullDate}`);
+      }
+
+      // if today flag does not exist
+      if (!fs.existsSync(`${baseDir}/orders/${fullDate}/${today}`)) {
+        // Create todays directory
+        fs.mkdirSync(`${baseDir}/orders/${fullDate}/${today}`);
+        // Wait till orders are processed
+        await processOrders();
+      } else {
+        // Get the directories name and iterate it by 1
+        fs.readdir(`${baseDir}/orders/${fullDate}`, (err, dirs) => {
+          if(err) {
+            console.log(err);
+          }
+          let nextDir = Math.max(...dirs);
+          nextDir++;
+          today = nextDir;
+          // Create todays directory
+          fs.mkdirSync(`${baseDir}/orders/${fullDate}/${nextDir}`);
+        });
+
+        // Wait till orders are processed
+        await processOrders();
+      }
+  }
+
+  // Process all the orders and save the png
   function processOrders() {
-    return new Promise((resolve, reject) => {
-      /* When completed change `i` to completed. For pitney unique transaction ID use a order number of some sort */
-      let i = 1;
-      // Loop through orders
-      for(const order of orders) {
-        // Address verification options
-        const verify = httpReq.httpOptions('api-sandbox.pitneybowes.com', 443, '/shippingservices/v1/addresses/verify', 'POST', {
-          'Authorization': `Bearer  ${auth}`,
-          'Content-Type': 'application/json'
-        });
-    
-        // Address verification data
-        const verifyData = JSON.stringify({
-          "addressLines": [
-            order.billing.address1,
-            order.billing.address2
-          ],
-          "cityTown": order.billing.city,
-          "stateProvince": order.billing.state,
-          "postalCode": order.billing.zip,
-          "countryCode": order.billing.country,
-          "company": "Company placeholder",
-          "name": order.billing.firstName,
-          "phone": order.billing.phone,
-          "email": order.billing.email,
-          "residential": false
-        });
-    
-        // Address verification http request
-        httpReq.retrieve(verify, verifyData, (err, verified) => {
-          if(err) console.log(err);
-          
+    return new Promise(async (resolve) => {
+      try {
+        let transactionF = 1;
+        // Loop through orders
+        for(const order of orders) {
+          // Address verification options
+          const verify = httpReq.httpOptions('api-sandbox.pitneybowes.com', 443, '/shippingservices/v1/addresses/verify', 'POST', {
+            'Authorization': `Bearer  ${auth}`,
+            'Content-Type': 'application/json'
+          });
+      
+          // Address verification data
+          const verifyData = JSON.stringify({
+            "addressLines": [
+              order.billing.address1,
+              order.billing.address2
+            ],
+            "cityTown": order.billing.city,
+            "stateProvince": order.billing.state,
+            "postalCode": order.billing.zip,
+            "countryCode": order.billing.country,
+            "company": "Company placeholder",
+            "name": order.billing.firstName,
+            "phone": order.billing.phone,
+            "email": order.billing.email,
+            "residential": false
+          });
+      
+          // Address verification http request
+          const verified = await httpReq.retrieve(verify, verifyData);
+  
           // Print options
           const print = httpReq.httpOptions('api-sandbox.pitneybowes.com', 443, '/shippingservices/v1/shipments?includeDeliveryCommitment=true', 'POST', {
             'Authorization': `Bearer  ${auth}`,
             'Content-Type': 'application/json',
-            'X-PB-TransactionId': `X-PB-ID-${dateNow}-${i}`
+            'X-PB-TransactionId': `X-PB-ID-${dateNow}-${transactionF}`
           });
           
           // Print data
@@ -316,41 +346,25 @@ orders.createOrderLabels = async (orders, user) => {
           });
           
           // Get print label
-          httpReq.retrieve(print, printData, (err, label) => {
-            if(err) reject(err);
-            
-            const image = label.documents[0].pages[0].contents;
-
-            // If todays date directory does not exist
-            if (!fs.existsSync(`${baseDir}/orders/${fullDate}`)){
-              // Create directory
-              fs.mkdirSync(`${baseDir}/orders/${fullDate}`);
-            }
-
-            // // if today flag does not exist
-            // if (!fs.existsSync(`${baseDir}/orders/${fullDate}/${today}`)){
-            //   // Create todays directory
-            //   fs.mkdirSync(`${baseDir}/orders/${fullDate}/${today}`);
-            //   today++
-            // }
-
-            // Save label as png
-            fs.writeFile(`${baseDir}/orders/${fullDate}/${dateNow}-${i}.png`, image, 'base64', function(err) {
-              if(err) {
-                reject(err);
-              }
-              i++;
-              if(i-1 === orders.length) {
-                resolve();
-              };
-
-            });
-          });
-        });
+          const label = await httpReq.retrieve(print, printData);
+          
+          const image = label.documents[0].pages[0].contents;
+  
+          // Save label as png | --@NOTE-- If error persists where some labes are not being saved try `sync` version
+          fs.writeFileSync(`${baseDir}/orders/${fullDate}/${today}/${dateNow}-${transactionF}.png`, image, 'base64');
+          transactionF++;
+          if(transactionF-1 === orders.length) {
+            resolve();
+          };
+        }
+      } catch(e) {
+        // Eventually we will have to make it so errors report the specific order that had an error.
+        console.log(e)
       }
     });
   }
-  await processOrders();
+  // Wait till the create Folders is completed
+  await createFolder();
 
 }
 
@@ -363,22 +377,26 @@ orders.printOrderLabels = async () => {
     size: [288, 432] // 72 === 1 inch
   });
 
+  // Merge the png files label into a pdf
   function mergeLabels() {
     return new Promise((resolve, reject) => {
+      // i is to keep track of when this promise is resolved
       let i = 0;
-      fs.readdir(`${baseDir}/orders/${fullDate}`, (err, fileNames) => {
+      // Read all the files in the directory
+      fs.readdir(`${baseDir}/orders/${fullDate}/${today}`, (err, fileNames) => {
         if(err) {
           reject(err);
         }
+        // Loop through file names
         for(const file of fileNames) {
           // If first loop
           if(i === 0) {
-            pdf.image(`${baseDir}/orders/${fullDate}/${file}`, 0, 0, {
+            pdf.image(`${baseDir}/orders/${fullDate}/${today}/${file}`, 0, 0, {
               width: 288,
               height: 432
             });
           } else {
-            pdf.addPage().image(`${baseDir}/orders/${fullDate}/${file}`, 0, 0, {
+            pdf.addPage().image(`${baseDir}/orders/${fullDate}/${today}/${file}`, 0, 0, {
               width: 288,
               height: 432
             });
@@ -388,13 +406,15 @@ orders.printOrderLabels = async () => {
             resolve();
           }
         }
-        
+
       });
     });
   }
   await mergeLabels();
+
+  // End the pdf library and create pdf file
   pdf.end();
-  pdf.pipe(fs.createWriteStream(`${baseDir}/orders/${fullDate}/labels.pdf`));
+  pdf.pipe(fs.createWriteStream(`${baseDir}/orders/${fullDate}/${today}/labels.pdf`));
 
 }
 

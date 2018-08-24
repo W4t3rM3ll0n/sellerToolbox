@@ -74,13 +74,12 @@ router.post('/getOrdersByStatus', passport.authenticate('jwt', { session: false 
 
 router.post('/printOrders', passport.authenticate('jwt', { session: false }), async (req, res) => {
   const orders = req.body.orders;
-  // const auth = req.user.tokens.pitneyBowesAuthToken;
   const user = req.user;
 
   await configOrders.createOrderLabels(orders, user)
   await configOrders.printOrderLabels()
-    .then((success) => {
-      res.json({ success });
+    .then(() => {
+      res.json({ success: 'Print order labels completed' });
     })
     .catch(error => res.json({ error: error.message }));
 

@@ -132,7 +132,7 @@ export class OrdersComponent implements OnInit {
   // Send selectedOrders to server
   this.toolboxService.printOrders(this.selectedOrders)
     .subscribe(res => {
-    console.log(res);
+      console.log(res);
     });
 
   }

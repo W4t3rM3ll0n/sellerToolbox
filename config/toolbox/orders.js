@@ -206,13 +206,17 @@ orders.createOrderLabels = async (orders, user) => {
       // If todays date directory does not exist
       if (!fs.existsSync(`${baseDir}/orders/${fullDate}`)) {
         // Create directory
-        fs.mkdirSync(`${baseDir}/orders/${fullDate}`);
+        fs.mkdir(`${baseDir}/orders/${fullDate}`, (err) => {
+          if(err) console.log(err);
+        });
       }
 
       // if today flag does not exist
       if (!fs.existsSync(`${baseDir}/orders/${fullDate}/${today}`)) {
         // Create todays directory
-        fs.mkdirSync(`${baseDir}/orders/${fullDate}/${today}`);
+        fs.mkdir(`${baseDir}/orders/${fullDate}/${today}`, (err) => {
+          if(err) console.log(err);
+        });
         // Wait till orders are processed
         await processOrders();
       } else {
@@ -225,7 +229,9 @@ orders.createOrderLabels = async (orders, user) => {
           nextDir++;
           today = nextDir;
           // Create todays directory
-          fs.mkdirSync(`${baseDir}/orders/${fullDate}/${nextDir}`);
+          fs.mkdir(`${baseDir}/orders/${fullDate}/${nextDir}`, (err) => {
+            if(err) console.log(err);
+          });
         });
 
         // Wait till orders are processed
@@ -245,7 +251,7 @@ orders.createOrderLabels = async (orders, user) => {
             'Authorization': `Bearer  ${auth}`,
             'Content-Type': 'application/json'
           });
-      
+          
           // Address verification data
           const verifyData = JSON.stringify({
             "addressLines": [
@@ -262,7 +268,7 @@ orders.createOrderLabels = async (orders, user) => {
             "email": order.billing.email,
             "residential": false
           });
-      
+          
           // Address verification http request
           const verified = await httpReq.retrieve(verify, verifyData);
   
@@ -348,14 +354,21 @@ orders.createOrderLabels = async (orders, user) => {
           // Get print label
           const label = await httpReq.retrieve(print, printData);
           
+          // Label gives you idea of certain errors
+          // console.log(label);
           const image = label.documents[0].pages[0].contents;
-  
-          // Save label as png | --@NOTE-- If error persists where some labes are not being saved try `sync` version
-          fs.writeFileSync(`${baseDir}/orders/${fullDate}/${today}/${dateNow}-${transactionF}.png`, image, 'base64');
-          transactionF++;
-          if(transactionF-1 === orders.length) {
-            resolve();
-          };
+          
+          // Save label as png
+          fs.writeFile(`${baseDir}/orders/${fullDate}/${today}/${dateNow}-${transactionF}.png`, image, 'base64', (err) => {
+            if(err) {
+              console.log(err);
+            }
+
+            transactionF++;
+            if(transactionF-1 === orders.length) {
+              resolve();
+            };
+          });
         }
       } catch(e) {
         // Eventually we will have to make it so errors report the specific order that had an error.
@@ -395,11 +408,21 @@ orders.printOrderLabels = async () => {
               width: 288,
               height: 432
             });
+            fs.unlink(`${baseDir}/orders/${fullDate}/${today}/${file}`, (err) => {
+              if (err) console.log(err);
+              console.log(`${file} was deleted`);
+            });
+
           } else {
             pdf.addPage().image(`${baseDir}/orders/${fullDate}/${today}/${file}`, 0, 0, {
               width: 288,
               height: 432
             });
+            fs.unlink(`${baseDir}/orders/${fullDate}/${today}/${file}`, (err) => {
+              if (err) console.log(err);
+              console.log(`${file} was deleted`);
+            });
+
           }
           i++
           if(i === fileNames.length-1) {
@@ -412,9 +435,10 @@ orders.printOrderLabels = async () => {
   }
   await mergeLabels();
 
+  // Save pdf file in record
+  pdf.pipe(fs.createWriteStream(`${baseDir}/orders/${fullDate}/${today}/labels.pdf`));
   // End the pdf library and create pdf file
   pdf.end();
-  pdf.pipe(fs.createWriteStream(`${baseDir}/orders/${fullDate}/${today}/labels.pdf`));
 
 }
 

@@ -22,17 +22,14 @@ module.exports = {
 			'grant_type': 'client_credentials'
 		});
 
-		await httpReq.retrieve(options, postData, async (err, result) => {
-			if(err) throw err;
+		const result = await httpReq.retrieve(options, postData);
 
-			let user = await Users.findOne({ _id: userId }).exec();
-			user.tokens.pitneyBowesAuthToken = result.access_token;
+		let user = await Users.findOne({ _id: userId }).exec();
+		user.tokens.pitneyBowesAuthToken = result.access_token;
 
-			await Users.update({ _id: userId }, user).exec();
-	
-		});
+		await Users.update({ _id: userId }, user).exec();
 
-		return 'Auth Token saved'
+		return 'Access Token saved'
 
 	}
 

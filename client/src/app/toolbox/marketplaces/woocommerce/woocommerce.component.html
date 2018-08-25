@@ -1,0 +1,9 @@
+<h2>Woocommerce</h2>
+<hr>
+<button 
+    class="btn btn-primary" 
+    (click)="apiTestCall()">Test Call</button>
+<br><br>
+<div *ngIf="testResult">
+    {{ testResult | json }}
+</div>

@@ -1,0 +1,12 @@
+.list-group-item  {
+    padding: 3px 3px;
+}
+  
+.list-group-item.active {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.breadcrumb {
+    margin: 0;
+    font-weight: bold;
+}

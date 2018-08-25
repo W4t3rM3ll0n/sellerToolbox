@@ -1,0 +1,26 @@
+<div class="row">
+  <div class="col-sm-3">
+    <div class="col-sm-12">
+      <h3>Products</h3>
+      <hr>
+      <ul class="list-group">
+        <li routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="list-group-item">
+          <a routerLink="/ebay/ebayProducts/active" class="nav-link">Active</a>
+        </li>
+        <li routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="list-group-item">
+          <a routerLink="/ebay/ebayProducts/inventory" class="nav-link">Inventory</a>
+        </li>
+        <li routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="list-group-item">
+          <a routerLink="/ebay/ebayProducts/createProduct" class="nav-link">Create</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="col-sm-9">
+    <div class="col-sm-12">
+        <h3>Details</h3>
+        <hr>
+        <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,83 @@
+<!-- ebay.products.componenets.html wraps this section with col-sm-9 & 12 -->
+<h5>Create Products</h5>
+
+<div id="scrollStyle" class="horizontal-scroll">
+  <form [formGroup]="createProductsForm" (ngSubmit)="onCreateProducts()">
+    <table formArrayName="products" class="table table-hover cell-border">
+      <thead>
+        <tr class="table-success">
+          <th scope="col"></th>
+          <th scope="col">SKU</th>
+          <th scope="col">Title</th>
+          <th scope="col">Description</th>
+          <th scope="col">Aspects</th>
+          <th scope="col">UPC</th>
+          <th scope="col">Image(s)</th>
+          <th scope="col">Condition</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody *ngFor="let product of createProductsForm.controls.products.controls; let i=index;">
+          <tr [formGroupName]="i">
+            <td class="align-middle">{{i + 1}}</td>
+            <td>
+              <input
+                type="text"
+                formControlName="sku"
+                class="form-control-sm">
+            </td>
+            <td>
+              <input
+                type="text"
+                formControlName="title"
+                class="form-control-sm">
+            </td>
+            <td>
+
+              <app-description-modal
+                (modalOpened)="onDescriptionModalOpened(i, $event)"
+                (modalClosed)="onDescriptionModalClosed(i, $event)"
+                [descriptionGroup]="createProductsForm.controls.products.controls[i]"></app-description-modal>
+
+            </td>
+            <td>
+              <input 
+                type="text"
+                formControlName="aspects"
+                class="form-control-sm">
+            </td>
+            <td>
+              <input 
+                type="text"
+                formControlName="upc"
+                class="form-control-sm">
+            </td>
+            <td>
+              <input 
+                type="text"
+                formControlName="images"
+                class="form-control-sm">
+            </td>
+            <td>
+              <input 
+                type="text"
+                formControlName="condition"
+                class="form-control-sm">
+            </td>
+
+            <ng-template [ngIf]="createProductsForm.controls.products.controls.length > 1">
+              <td (click)="removeProductRow(i)" class="align-middle" style="cursor: pointer;">&times;</td>
+            </ng-template>
+
+            <ng-template [ngIf]="createProductsForm.controls.products.controls.length === 1">
+              <td></td>
+            </ng-template>
+
+          </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-primary mr-sm-2" type="submit">Create Products</button>
+    <button (click)="addNewProductRow()" class="btn btn-success mr-sm-2" type="button">Add Row</button>
+    <br><br>
+  </form>
+</div>

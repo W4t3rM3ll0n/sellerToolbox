@@ -1,0 +1,24 @@
+<div class="row">
+    <div class="col-sm-8 mx-auto">
+        <div class="jumbotron">
+            <h1 class="display-5">Welcome to the Seller Tool Box</h1>
+            <p class="lead">
+                The seller tool box is a web application that helps you manage all your marketplaces in one place.
+            </p>
+            <hr class="my-3">
+            <p class="lead">
+                <ng-template [ngIf]="!authService.isAuthenticated()">
+                <a class="btn btn-primary btn-lg" routerLink="/login" role="button">Login</a>
+                |
+                <a class="btn btn-primary btn-lg" routerLink="/register" role="button">Register</a>
+                </ng-template>
+                <ng-template [ngIf]="authService.isAuthenticated()">
+                    <a class="btn btn-primary btn-lg" routerLink="/toolbox/dashboard" role="button">ToolBox</a>
+                </ng-template>
+                <!-- <ng-template [ngIf]="authService.isAuthenticated()">
+                    <a class="btn btn-primary btn-lg" routerLink="/ebay" role="button">Ebay</a>
+                </ng-template> -->
+            </p>
+        </div>                
+    </div>
+</div>

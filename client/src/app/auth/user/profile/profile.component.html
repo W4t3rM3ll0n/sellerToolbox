@@ -1,0 +1,178 @@
+<div class="row">
+  <div class="col-sm-12">
+    <form (ngSubmit)="onUpdateUser(f)" #f="ngForm">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input 
+          type="text" 
+          name="name"
+          ngModel="{{ user?.name }}"
+          class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          name="email" 
+          ngModel="{{ user?.email }}"
+          class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input 
+          type="text" 
+          name="username" 
+          ngModel="{{ user?.username }}"
+          class="form-control">
+      </div>
+      <button 
+        class="btn btn-primary" 
+        type="submit">Update User</button>
+    </form>
+    <hr>
+    <!-- Addresses -->
+    <h3>Addresses</h3>
+    <div id="scrollStyle" class="horizontal-scroll">
+      <form *ngIf="addUpdateAddressForm" [formGroup]="addUpdateAddressForm" (ngSubmit)="onAddUpdateAddress()">
+        <table formArrayName="addresses" class="table table-hover cell-border">
+          <thead>
+            <tr class="table-success">
+              <th scope="col"></th>
+              <th scope="col">Company</th>
+              <th scope="col">Name</th>
+              <th scope="col">Address 1</th>
+              <th scope="col">Address 2</th>
+              <th scope="col">City</th>
+              <th scope="col">State</th>
+              <th scope="col">Zip</th>
+              <th scope="col">Country</th>
+              <th scope="col">Primary</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody *ngFor="let address of addUpdateAddressForm.controls.addresses.controls; let i=index;">
+            <tr class="cell-border" [formGroupName]="i">
+              <td class="align-middle">{{i + 1}}</td>
+
+              <input 
+                type="hidden"
+                class="form-control"
+                formControlName="id">
+              <input 
+                type="hidden"
+                class="form-control"
+                formControlName="fullAddress">
+
+              <td class="align-middle">
+                  <input 
+                    type="text"
+                    class="form-control"
+                    formControlName="company">
+              </td>
+              <td class="align-middle">
+                  <input 
+                    type="text"
+                    class="form-control"
+                    formControlName="name">
+              </td>
+              <td class="align-middle">
+                  <input 
+                    type="text"
+                    class="form-control"
+                    formControlName="address1">
+              </td>
+              <td class="align-middle">
+                  <input 
+                    type="text"
+                    class="form-control"
+                    formControlName="address2">
+              </td>
+              <td class="align-middle">
+                  <input 
+                    type="text"
+                    class="form-control"
+                    formControlName="city">
+              </td>
+              <td class="align-middle">
+                  <input 
+                    type="text"
+                    class="form-control"
+                    formControlName="state">
+              </td>
+              <td class="align-middle">
+                  <input 
+                    type="text"
+                    class="form-control"
+                    formControlName="zip">
+              </td>
+              <td class="align-middle">
+                  <input 
+                    type="text"
+                    class="form-control"
+                    formControlName="country">
+              </td>
+              <td class="align-middle">
+                  <input
+                    type="radio"
+                    class="radios form-control"
+                    name="primary"
+                    [checked]="user.addresses[i]?.primary"
+                    formControlName="primary">
+              </td>
+              <ng-template [ngIf]="addUpdateAddressForm.controls.addresses.controls.length > 1">
+                <td (click)="removeAddressRow(i)" class="align-middle" style="cursor: pointer;">&times;</td>
+              </ng-template>
+
+              <ng-template [ngIf]="addUpdateAddressForm.controls.addresses.controls.length === 1">
+                <td></td>
+              </ng-template>
+            
+            </tr>
+          </tbody>
+        </table> 
+        <button type="button" class="btn btn-outline-warning mr-sm-2" (click)="onAddAddress()">Add</button>
+        <button type="submit" class="btn btn-outline-success mr-sm-2">Submit</button>
+        <br><br>
+      </form>
+    </div>
+
+    <hr>
+    <!-- Change Password -->
+    <h3>Change Password</h3>
+    <form (ngSubmit)="onUpdatePassword(p)" #p="ngForm">
+      <div class="form-group">
+        <label for="password">Current Password</label>
+        <input 
+          type="password" 
+          name="password"
+          ngModel
+          class="form-control"
+        >
+      </div>
+      <div class="form-group">
+        <label for="newPassword">New Password</label>
+        <input 
+          type="password" 
+          name="newPassword"
+          ngModel
+          class="form-control"
+        >
+      </div>
+      <button 
+        class="btn btn-primary" 
+        type="submit"
+      >Update Password</button>
+    </form>
+    <hr>
+    <!-- Delete User -->
+    <h3>Delete User</h3>
+    <hr>
+    <button (click)="onDeleteUser()" class="btn btn-danger">Delete</button>
+
+    <br><br>
+    <h3>Random Account Functions (-- Move To Different Modules --)</h3>
+    <hr>
+    <button type="button" class="btn btn-outline-warning mr-sm-2" (click)="onAuthPitneyBowes()">PitneyBowes Auth</button>
+
+  </div>
+</div>

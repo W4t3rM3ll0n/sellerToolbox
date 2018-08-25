@@ -1,0 +1,72 @@
+<h2>Link Items</h2>
+<hr>
+<!-- Search Toolbox/Marketplace Items -->
+<form class="form-inline" (ngSubmit)="onSearchItems(s)" #s="ngForm">
+  <input 
+    class="form-control mr-sm-2"
+    type="text"
+    name="search"
+    ngModel
+    placeholder="Search Items">
+  <button class="btn btn-secondary mr-sm-2" type="submit">Search</button>
+  <button type="button" class="btn btn-success" (click)="onLinkItems()">Link</button>
+</form>
+<!-- Link Items Chart -->
+<div class="row">
+  <div class="col-sm-7">
+    <br>
+    <!-- Begin Toolbox List -->
+    <h5 class="list-group-item">Seller Toolbox</h5>
+    <table class="table table-hover table-bordered">
+      <thead>
+        <tr class="table-success">
+          <th></th>
+          <th (click)="filterBySku()" style="cursor: pointer;">SKU</th>
+          <th (click)="filterByTitle()" style="cursor: pointer;">Title</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="toolboxOrders" (click)="onSelectToolboxItem(i)" *ngFor="let item of sellerToolboxItems; let i = index;">
+
+          <td class="align-middle">{{i + 1}}</td>
+          <td>
+            <span class="p">{{ item.sku }}</span>
+          </td>
+          <td>
+            <span class="p">{{ item.title }}</span>
+          </td>
+  
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- Split -->
+  <div class="col-sm-5">
+    <br>
+    <!-- Begin Marketplace List -->
+    <h5 class="list-group-item">Marketplace</h5>
+    <table class="table table-hover table-bordered">
+      <thead>
+        <tr class="table-warning">
+          <th></th>
+          <th (click)="filterBySku()" style="cursor: pointer;">SKU</th>
+          <th (click)="filterByTitle()" style="cursor: pointer;">Title</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="selectedToolboxItem.length === 1">
+        <tr class="marketplaceOrders" (click)="onSelectMarketplaceItem(i)" *ngFor="let item of wooItems; let i = index;">
+
+          <td class="align-middle">{{i + 1}}</td>
+          <td>
+            <span class="p">{{ item.sku }}</span>
+          </td>
+          <td>
+            <span class="p">{{ item.name }}</span>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+

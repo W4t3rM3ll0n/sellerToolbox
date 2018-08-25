@@ -1,0 +1,17 @@
+Seller Toolbox: An Open-Source Peer-to-Peer Inventory System
+
+Andrew Lee
+akeon.lee@gmail.com
+www.weboid.org
+
+Abstract. An open-source online social inventory system that will allow online retailers to manage their inventory, find suppliers for products,
+share information about products, get analytics/data for a competitive market and keep track of tasks to do. The concept of an inventory system is
+nothing new. The inventory system that is built for the Seller Toolbox will be very similar to the many inventory systems available out in the market.
+The main keyword to take away from this to make this application unique is 'social'. The Seller Toolbox will be offered for free for any user and will 
+generate profits through advertisment. Using the same concept for social media websites such as Facebook, Instagram, Twitter and more. It will be a place
+where people conduct business and track their inventory. At the same time the main takeaway will be the fact that each user will act as a user does in
+a social platform such as Facebook. The members of the community will be able to add each others in a friends list, share information about products, 
+and do tasks that is related to social media sites. The inventory system will be the core and incentive for people to use this social platform, in the
+beginning.
+
+1. Introduction

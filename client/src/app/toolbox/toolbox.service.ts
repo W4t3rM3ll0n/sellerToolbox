@@ -116,13 +116,13 @@ export class ToolboxService {
       )
   }
 
-  saveOrders(orders) {
+  saveOrders() {
     let headers = new Headers();
     this.loadToken();
     headers.append('Authorization', this.jwtToken);
     headers.append('Content-Type', 'application/json');
     this.jwtToken = null;
-    return this.http.post('http://localhost:3000/toolbox/orders/saveOrders', { orders: orders }, { headers: headers })
+    return this.http.get('http://localhost:3000/toolbox/orders/saveOrders', { headers: headers })
       .pipe(
         map(orders => orders.json())
       )

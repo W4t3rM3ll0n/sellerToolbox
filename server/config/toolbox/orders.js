@@ -4,7 +4,6 @@ const PDFKit = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
-
 const Orders = require('../../models/order');
 const Products = require('../../models/products');
 const httpReq = require('../../config/httpReq');
@@ -22,18 +21,31 @@ orders.getAllOrders = async (userId) => {
 }
 
 // Save orders to the database.
-orders.saveOrders = async (orders, userId) => {
+orders.saveOrders = async (orders, user) => {
   // Loop through orders
   for(const order of orders) {
     order.marketplace = 'woocommerce'; // Currently setting marketplace manually. Change to be dynamic.
-    
+
     // Await found orders
     const finds = await Orders.find( { marketplaceID: order.id } ).exec();
     
     // Get order items for shipFrom address
     for(const item of order.line_items) {
-      // console.log(item.sku);
-      const shipFrom = await Products.findOne({ sku: item.sku, userId: userId }).exec();
+      // shipFrom variable declared
+      let shipFrom;
+      const shipFromProduct = await Products.findOne({ sku: item.sku, userId: user._id }).exec();
+      // If there is an address in product
+      if(shipFromProduct) {
+        shipFrom = shipFromProduct.location;
+      } else {
+        // We get the primary address on the user account
+        for(const address of user.addresses) {
+          if(address.primary) {
+            shipFrom = address;
+          }
+        }
+      }
+
       // If finds === 0, order does not exist in database
       if(finds.length === 0) {
         // Create the order object
@@ -65,16 +77,16 @@ orders.saveOrders = async (orders, userId) => {
             country: order.shipping.country
           },
           shipFrom: {
-            company: shipFrom.location.company,
-            name: shipFrom.location.name,
-            address1: shipFrom.location.address1,
-            address2: shipFrom.location.address2,
-            city: shipFrom.location.city,
-            state: shipFrom.location.state,
-            zip: shipFrom.location.zip,
-            country: shipFrom.location.country,
-            email: shipFrom.location.email,
-            phone: shipFrom.location.phone
+            company: shipFrom.company,
+            name: shipFrom.name,
+            address1: shipFrom.address1,
+            address2: shipFrom.address2,
+            city: shipFrom.city,
+            state: shipFrom.state,
+            zip: shipFrom.zip,
+            country: shipFrom.country,
+            email: shipFrom.email,
+            phone: shipFrom.phone
           },
           orderItems: order.line_items,
           currency: order.currency,
@@ -88,21 +100,17 @@ orders.saveOrders = async (orders, userId) => {
           modifiedDate: order.date_modified,
           completedDate: order.date_completed,
           status: order.status,
-          userId: userId
+          userId: user._id
         }
         // Insert order object to database
         await Orders.create(orderObj);
-        
       }
     }
-
-
   }
-
 }
 
+// Update orders
 orders.updateOrders = async (orders, options, userId) => {
-
   // Loop through the orders passed in
   for(const order of orders) {
     // Get `marketplaceID` for order
@@ -138,7 +146,6 @@ orders.updateOrders = async (orders, options, userId) => {
               // Remove the order from product.orders
               product.orders.splice(orderIndex, 1);
             }
-
           }
 
           if(options !== 'completed') {
@@ -153,9 +160,7 @@ orders.updateOrders = async (orders, options, userId) => {
               // Add the order into the array
               product.orders.push(order);
             }
-
           }
-
         }
         // Update product.quantity.pendingOrders
         product.quantity.pendingOrders = product.orders.length
@@ -166,9 +171,9 @@ orders.updateOrders = async (orders, options, userId) => {
     // Update the status of each order
     await Orders.update({ _id: order._id, userId: userId }, { status: options }).exec();
   }
-  
 }
 
+// Delete orders
 orders.deleteOrders = async (orders) => {
   // If orders is a string it is a single order
   if(typeof orders === 'string') {
@@ -180,7 +185,6 @@ orders.deleteOrders = async (orders) => {
       await Orders.find({ _id: order._id }).remove().exec();
     }
   }
-
 }
 
 orders.getOrdersByStatus = async (status, userId) => {
@@ -251,7 +255,7 @@ orders.createOrderLabels = async (orders, user) => {
             'Authorization': `Bearer  ${auth}`,
             'Content-Type': 'application/json'
           });
-          
+
           // Address verification data
           const verifyData = JSON.stringify({
             "addressLines": [
@@ -262,8 +266,8 @@ orders.createOrderLabels = async (orders, user) => {
             "stateProvince": order.billing.state,
             "postalCode": order.billing.zip,
             "countryCode": order.billing.country,
-            "company": "Company placeholder",
-            "name": order.billing.firstName,
+            "company": order.billing.company,
+            "name": `${order.billing.firstName} ${order.billing.lastName}`,
             "phone": order.billing.phone,
             "email": order.billing.email,
             "residential": false
@@ -378,7 +382,6 @@ orders.createOrderLabels = async (orders, user) => {
   }
   // Wait till the create Folders is completed
   await createFolder();
-
 }
 
 // Save files to pdf
@@ -410,7 +413,7 @@ orders.printOrderLabels = async () => {
             });
             fs.unlink(`${baseDir}/orders/${fullDate}/${today}/${file}`, (err) => {
               if (err) console.log(err);
-              console.log(`${file} was deleted`);
+              // console.log(`${file} was deleted`);
             });
 
           } else {
@@ -420,7 +423,7 @@ orders.printOrderLabels = async () => {
             });
             fs.unlink(`${baseDir}/orders/${fullDate}/${today}/${file}`, (err) => {
               if (err) console.log(err);
-              console.log(`${file} was deleted`);
+              // console.log(`${file} was deleted`);
             });
 
           }
@@ -439,7 +442,6 @@ orders.printOrderLabels = async () => {
   pdf.pipe(fs.createWriteStream(`${baseDir}/orders/${fullDate}/${today}/labels.pdf`));
   // End the pdf library and create pdf file
   pdf.end();
-
 }
 
 module.exports = orders;

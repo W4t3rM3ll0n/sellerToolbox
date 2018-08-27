@@ -43,11 +43,9 @@ export class ProfileComponent implements OnInit {
     }
 
     this.authService.updateUser(updateUser)
-      .subscribe(
-        res => {
+      .subscribe(res => {
           console.log(res);
-        }
-      );
+      });
   }
 
   initAddressForm() {

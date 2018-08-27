@@ -1,84 +1,96 @@
 'use strict'
+// Dependencies
 const querystring = require('querystring');
 const WooAPI = require('woocommerce-api');
-// const Products = require('../../models/products');
-
 require('dotenv').config();
+const Users = require('../../models/users');
+
+// Instantiate Container
+const woocommerce = {};
 
 // OAuth Function when calling to Woocomerce API
-function oAuth(url, version) {
+function oAuth(url, version, key, secret) {
   return new WooAPI({
     url: url,
-    consumerKey: process.env.WOO_KEY,
-    consumerSecret: process.env.WOO_SECRET,
+    consumerKey: key,
+    consumerSecret: secret,
     wpAPI: true,
     version: version,
     // queryStringAuth: true // Force Basic Authentication as query string true and using under HTTPS
   });
 }
 
-module.exports = {
-
-  getUrlForKeys: () => {
-    const store_url = 'https://publifiedlabs.com/apiTest';
-    const endpoint = '/wc-auth/v1/authorize';
-    const params = {
-      app_name: 'Seller Toolbox',
-      scope: 'read_write',
-      user_id: 123,
-      return_url: 'https://localhost:3000/user/woocommerce',
-      callback_url: 'https://localhost:3000/user/woocommerce'
-    };
-    const query_string = querystring.stringify(params).replace(/%20/g, '+');
-    
-    // console.log(store_url + endpoint + '?' + query_string);
-    const redirectUrl = store_url + endpoint + '?' + query_string;
-    return redirectUrl;
-  },
-
-  // Get All Orders
-  getAllOrders(callback) {
-    const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2');
-    Woocommerce.get('orders', (err, data, res) => {
-      err ? callback(err, null) : callback(null, res);
-    });
-  },
-
-  // Initiate the oAuth function then call the HTTP request to Woocommerce's end points.
-  getOrdersByStatus(status, callback) {
-    const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2');
-    Woocommerce.get('orders?status='+status, (err, data, res) => {
-      err ? callback(err, null) : callback(null, res);
-    });
-  },
-
-  updateOrders(orders, action, options, userId, callback) {
-    const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2');
-    const data = action;
-    const keyNames = Object.keys(data);
-    orders.forEach((order) => {
-      // Section to update order on marketplace
-      if(keyNames[0] === 'update') {
-        data.update.push({
-          id: order.marketplaceID,
-          status: options
-        });
-      } else if(keyNames[0] === 'delete') {
-        data.delete.push(order.marketplaceID);
-      }
-    });
-    // console.log(data);
-
-    Woocommerce.put('orders/batch', data, (err, data, res) => {
-      err ? callback(err, null) : callback(null, res);
-    });
-  },
-
-  getAllProducts(callback) {
-    const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2');
-    Woocommerce.get('products', (err, data, res) => {
-      err ? callback(err, null) : callback(null, res);
-    });
-  },
-
+// Get URL for keys
+woocommerce.getUrlForKeys = () => {
+  const store_url = 'https://publifiedlabs.com/apiTest';
+  const endpoint = '/wc-auth/v1/authorize';
+  const params = {
+    app_name: 'Seller Toolbox',
+    scope: 'read_write',
+    user_id: 123,
+    return_url: 'https://localhost:3000/user/woocommerce',
+    callback_url: 'https://localhost:3000/user/woocommerce'
+  };
+  const query_string = querystring.stringify(params).replace(/%20/g, '+');
+  
+  // console.log(store_url + endpoint + '?' + query_string);
+  const redirectUrl = store_url + endpoint + '?' + query_string;
+  return redirectUrl;
 }
+
+// Update Woo keys
+woocommerce.updateWooKeys = async (keys, id) => {
+  await Users.findByIdAndUpdate(id, keys).exec();
+};
+
+// Get All Orders
+woocommerce.getAllOrders = (tokens) => {
+  return new Promise((resolve, reject) => {
+    const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2', tokens.wooKey, tokens.wooSecret);
+    Woocommerce.get('orders', (err, data, res) => {
+      if(!err && res) {
+        resolve(JSON.parse(res));
+      } else {
+        reject(err);
+      };
+    });
+  });
+};
+
+// Initiate the oAuth function then call the HTTP request to Woocommerce's end points.
+woocommerce.getOrdersByStatus = (tokens, status, callback) => {
+  const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2', tokens.wooKey, tokens.wooSecret);
+  Woocommerce.get('orders?status='+status, (err, data, res) => {
+    err ? callback(err, null) : callback(null, res);
+  });
+}
+
+woocommerce.updateOrders = (tokens, orders, action, options, userId, callback) => {
+  const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2', tokens.wooKey, tokens.wooSecret);
+  const data = action;
+  const keyNames = Object.keys(data);
+  orders.forEach((order) => {
+    // Section to update order on marketplace
+    if(keyNames[0] === 'update') {
+      data.update.push({
+        id: order.marketplaceID,
+        status: options
+      });
+    } else if(keyNames[0] === 'delete') {
+      data.delete.push(order.marketplaceID);
+    }
+  });
+
+  Woocommerce.put('orders/batch', data, (err, data, res) => {
+    err ? callback(err, null) : callback(null, res);
+  });
+}
+
+woocommerce.getAllProducts = (tokens, callback) => {
+  const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2', tokens.wooKey, tokens.wooSecret);
+  Woocommerce.get('products', (err, data, res) => {
+    err ? callback(err, null) : callback(null, res);
+  });
+}
+
+module.exports = woocommerce;

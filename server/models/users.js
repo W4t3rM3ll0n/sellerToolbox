@@ -1,5 +1,5 @@
 'use strict'
-
+// Dependencies
 const mongoose = require('mongoose');
 
 // Users Schema
@@ -56,8 +56,9 @@ const usersSchema = new Schema({
             type: String,
             required: false
         },
-        pitneyBowesAuthToken: String
-
+        pitneyBowesAuthToken: String,
+        wooKey: String,
+        wooSecret: String
     }
 });
 

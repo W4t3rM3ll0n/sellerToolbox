@@ -1,4 +1,5 @@
 'use strict'
+// Dependencies
 const mongoose = require('mongoose');
 
 // Products Schema

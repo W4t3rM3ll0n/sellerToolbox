@@ -30,7 +30,6 @@ export class InventoryComponent implements OnInit, OnDestroy {
     // Get the user information for address.
     this.authService.getProfile()
       .subscribe((user) => {
-          // console.log(user);
           this.user = user;
         },
         err => console.log(err));
@@ -138,6 +137,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
     this.toolboxService.syncInventory()
       .subscribe((updates) => {
         console.log(updates);
+        this.ngOnInit();
       },
       err => console.log(err));
   }
@@ -158,17 +158,15 @@ export class InventoryComponent implements OnInit, OnDestroy {
     const productsDetail = this.updateProductsForm.value.products;
     
     this.toolboxService.updateItems(productsDetail)
-      .subscribe(() => {
+      .subscribe((updated) => {
+        console.log(updated);
         this.editModeOff = !this.editModeOff;
         // Controls enable/disable input.
         const control = this.updateProductsForm.controls['products'];
         control.disabled ? control.enable() : control.disable();
-      },
-      (err) => {
-        console.log(err);
-        return false;
+        this.ngOnInit();
       });
-  }
+  };
 
   onSelectItem(rowIndex: number) {
     
@@ -193,6 +191,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
 
   }
 
+  // Delete a single item
   onDeleteSingleItems(rowIndex: number) {
     // Remove a product row
     const control = <FormArray>this.updateProductsForm.controls['products'];
@@ -206,52 +205,46 @@ export class InventoryComponent implements OnInit, OnDestroy {
       this.toolboxService.deleteItems(item)
         .subscribe((deleted) => {
           console.log(deleted);
-        }, (err) => {
-          console.log(err);
-          return false;
+          this.ngOnInit();
         });
     } else {
       return false;
-
     }
   }
 
+  // Deleting multiple items
   onDeleteMultiItems() {
     if(!this.editModeOff) {
-      // Collect the ids of each row that are selected
-      const rowIds = []
-      // Get the array of values (all the products rows in one array). Compare the [selectedRows] with all the values in the array and remove if value[i].id matches.
-      const control = <FormArray>this.updateProductsForm.controls['products'];
-
-      this.selectedRows.forEach((item) => { // Gets back selected row item.
-        control.value.forEach((row) => { // Gets each row in the entire array of rows.
-
-          // Check to see if the selected row item matches the row from the entire array of rows.
-          if(item.value.id === row.id) {
-            // Get the index of the matching id rows that were selected.
-            const index = control.value.indexOf(row);
-            rowIds.push(row.id);
-
-            /* const dblCheck = confirm('Are you sure you want to delete these items?'); // Currenty prompts for each item.
-            dblCheck === true ? control.removeAt(index) : null; */
-
-            control.removeAt(index);
-          }
-
-        });
-      });
-      
-      // Call toolbox service to delete item from the database.
-      this.toolboxService.deleteItems(rowIds)
-        .subscribe((deleted) => {
-          console.log(deleted);
-          this.editModeOff = true;
-        }, (err) => {
-          console.log(err);
-          return false;
-        });
-    }
-  }
+      // Confirm to delete items
+      const dblCheck = confirm('Are you sure you want to delete these items?');
+      if(dblCheck) {
+        // Collect the ids of each row that are selected
+        const rowIds = [];
+        // Get the array of values (all the products rows in one array). Compare the [selectedRows] with all the values in the array and remove if value[i].id matches.
+        const control = <FormArray>this.updateProductsForm.controls['products'];
+        for(const item of this.selectedRows) {
+          for(const row of control.value) {
+            // Check to see if the selected row item matches the row from the entire array of rows.
+            if(item.value.id === row.id) {
+              // Get the index of the matching id rows that were selected.
+              const index = control.value.indexOf(row);
+              rowIds.push(row.id);
+              control.removeAt(index);
+            };
+          };
+        };
+        // Call toolbox service to delete item from the database.
+        this.toolboxService.deleteItems(rowIds)
+          .subscribe((deleted) => {
+            console.log(deleted);
+            this.editModeOff = true;
+            this.ngOnInit();
+          });
+      } else {
+        return false;
+      };
+    };
+  };
 
   resetToDefault(rowIndex?: number) {
     this.editModeOff = true;

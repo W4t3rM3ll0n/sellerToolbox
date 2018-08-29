@@ -14,9 +14,8 @@ router.get('/', (req, res) => {
 router.get('/getAllOrders', passport.authenticate('jwt', { session: false }), async (req, res) => {
   const id = req.user._id;
 
-  await configOrders.getAllOrders(id).then(orders => {
-    res.json({ orders });
-  }).catch(error => res.json({ error }));
+  const orders = await configOrders.getAllOrders(id);
+  res.json({ orders });
 });
 
 // Save orders from Woocommerce
@@ -80,6 +79,7 @@ router.post('/printOrders', passport.authenticate('jwt', { session: false }), as
   const user = req.user;
 
   await configOrders.createOrderLabels(orders, user);
+  await configWoo.updateOrders(req.user.tokens, orders, {update: []}, 'completed');
   await configOrders.updateOrders(orders, 'completed', user._id);
   await configOrders.printOrderLabels()
     .then(() => {

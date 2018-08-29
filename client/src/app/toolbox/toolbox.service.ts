@@ -50,7 +50,7 @@ export class ToolboxService {
     headers.append('Authorization', this.jwtToken);
     headers.append('Content-Type', 'application/json');
     this.jwtToken = null;
-    return this.http.put('http://localhost:3000/toolbox/inventory/createProducts', {products: productsDetail}, { headers: headers })
+    return this.http.put('http://localhost:3000/toolbox/inventory/createProducts', { products: productsDetail }, { headers: headers })
       .pipe(
         map(products => products.json())
       )
@@ -62,7 +62,7 @@ export class ToolboxService {
     headers.append('Authorization', this.jwtToken);
     headers.append('Content-Type', 'application/json');
     this.jwtToken = null;
-    return this.http.post('http://localhost:3000/toolbox/inventory/updateProducts', {products: productsDetail}, { headers: headers })
+    return this.http.post('http://localhost:3000/toolbox/inventory/updateProducts', { products: productsDetail }, { headers: headers })
       .pipe(
         map(products => products.json())
       )

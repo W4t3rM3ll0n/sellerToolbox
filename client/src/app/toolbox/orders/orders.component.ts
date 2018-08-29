@@ -25,7 +25,7 @@ export class OrdersComponent implements OnInit {
   this.resetToDefault();
   this.toolboxService.getOrdersByStatus(this.orderFilter)
     .subscribe((orders) => {
-    this.orders = orders;
+      this.orders = orders;
     });
   }
 
@@ -110,18 +110,14 @@ export class OrdersComponent implements OnInit {
     if(this.orderFilter === 'all') {
       this.toolboxService.getAllOrders()
       .subscribe((orders) => {
+        console.log(orders);
         this.orders = orders;
-      },
-      err => {
-        console.log(err);
       });
     } else {
       this.toolboxService.getOrdersByStatus(this.orderFilter)
       .subscribe((orders) => {
+        console.log(orders);
         this.orders = orders;
-      },
-      err => {
-      console.log(err);
       });
     }
   }

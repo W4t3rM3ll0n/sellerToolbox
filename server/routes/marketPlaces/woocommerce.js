@@ -33,28 +33,21 @@ router.post('/updateKeys', passport.authenticate('jwt', { session:false }), asyn
 router.get('/getAllOrders', passport.authenticate('jwt', { session:false }), async (req, res) => {
   const tokens = req.user.tokens;
   // Turn into promise init
-  configWoo.getAllOrders(tokens)
-    .then((orders) => {
-      console.log('hey');
-      res.json(orders);
-    })
-    .catch((err) => {
-      res.json({err});
-    });
+  const orders = await configWoo.getAllOrders(tokens);
+  res.json(orders);
 });
 
 // Get Orders By Status
-router.post('/getOrdersByStatus', passport.authenticate('jwt', { session:false }), (req, res) => {
+router.post('/getOrdersByStatus', passport.authenticate('jwt', { session:false }), async (req, res) => {
   const status = req.body.status;
   const tokens = req.user.tokens;
-  configWoo.getOrdersByStatus(tokens, status, (err, orders) => {
-    err ? res.json({err: err}) : res.json(JSON.parse(orders));
-  });
+  const orders = await configWoo.getOrdersByStatus(tokens, status);
+  res.json(orders);
 });
 
 // Update Orders
   // Route to update or delete single or multiple orders.
-router.post('/updateWooOrders', passport.authenticate('jwt', { session:false }), (req, res) => {
+router.post('/updateWooOrders', passport.authenticate('jwt', { session:false }), async (req, res) => {
   const orders = req.body.orders;
   const action = req.body.action;
   const options = req.body.options;
@@ -65,16 +58,14 @@ router.post('/updateWooOrders', passport.authenticate('jwt', { session:false }),
     // @orders - Array of orders, pass empty array if not using
     // @actions - Object of the action being taken which consists of an array
     // @options - The type of action to be performs. e.g. 'mark completed'
-  configWoo.updateOrders(tokens, orders, action, options, userId, (err, updated) => {
-    err ? res.json({err: err}) : res.json(JSON.parse(updated));
-  });
+  const updated = await configWoo.updateOrders(tokens, orders, action, options, userId);
+  res.json({updated});
 });
 
-router.get('/getAllProducts', passport.authenticate('jwt', { session:false }), (req, res) => {
+router.get('/getAllProducts', passport.authenticate('jwt', { session:false }), async (req, res) => {
   const tokens = req.user.tokens;
-  configWoo.getAllProducts(tokens, (err, products) => {
-    err ? res.json({err: err}) : res.json(JSON.parse(products));
-  });
+  const products = await configWoo.getAllProducts(tokens);
+  res.json(products);
 });
 
 module.exports = router;

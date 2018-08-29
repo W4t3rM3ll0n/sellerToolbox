@@ -66,7 +66,6 @@ export class LinkItemsComponent implements OnInit {
       this.toolboxService.getAllWooProducts()
       .subscribe((products) => {
         this.wooItems = products;
-        // console.log(this.wooItems);
       },
       err => {
         console.log(err);

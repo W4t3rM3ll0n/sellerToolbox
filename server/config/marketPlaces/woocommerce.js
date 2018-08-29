@@ -45,51 +45,71 @@ woocommerce.updateWooKeys = async (keys, id) => {
 
 // Get All Orders
 woocommerce.getAllOrders = (tokens) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2', tokens.wooKey, tokens.wooSecret);
     Woocommerce.get('orders', (err, data, res) => {
-      if(!err && res) {
-        resolve(JSON.parse(res));
+      if(err) {
+        resolve({ ok: false, 'Error': err });
       } else {
-        reject(err);
+        resolve(JSON.parse(res));
       };
     });
   });
 };
 
 // Initiate the oAuth function then call the HTTP request to Woocommerce's end points.
-woocommerce.getOrdersByStatus = (tokens, status, callback) => {
-  const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2', tokens.wooKey, tokens.wooSecret);
-  Woocommerce.get('orders?status='+status, (err, data, res) => {
-    err ? callback(err, null) : callback(null, res);
+woocommerce.getOrdersByStatus = (tokens, status) => {
+  return new Promise((resolve) => {
+    const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2', tokens.wooKey, tokens.wooSecret);
+    Woocommerce.get('orders?status='+status, (err, data, res) => {
+      if(err) {
+        resolve({ ok: false, 'Error': err });
+      } else {
+        resolve(JSON.parse(res));
+      };
+    });
+  });
+};
+
+// Update Woo orders in the marketplace
+woocommerce.updateOrders = (tokens, orders, action, options, userId) => {
+  return new Promise((resolve, reject) => {
+    const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2', tokens.wooKey, tokens.wooSecret);
+    const data = action;
+    const keyNames = Object.keys(data);
+    orders.forEach((order) => {
+      // Section to update order on marketplace
+      if(keyNames[0] === 'update') {
+        data.update.push({
+          id: order.marketplaceID,
+          status: options
+        });
+      } else if(keyNames[0] === 'delete') {
+        data.delete.push(order.marketplaceID);
+      }
+    });
+  
+    // Send call to the Woo API
+    Woocommerce.put('orders/batch', data, (err, data, res) => {
+      if(err) {
+        resolve(err);
+      } else {
+        resolve(JSON.parse(res));
+      }
+    });
   });
 }
 
-woocommerce.updateOrders = (tokens, orders, action, options, userId, callback) => {
-  const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2', tokens.wooKey, tokens.wooSecret);
-  const data = action;
-  const keyNames = Object.keys(data);
-  orders.forEach((order) => {
-    // Section to update order on marketplace
-    if(keyNames[0] === 'update') {
-      data.update.push({
-        id: order.marketplaceID,
-        status: options
-      });
-    } else if(keyNames[0] === 'delete') {
-      data.delete.push(order.marketplaceID);
-    }
-  });
-
-  Woocommerce.put('orders/batch', data, (err, data, res) => {
-    err ? callback(err, null) : callback(null, res);
-  });
-}
-
-woocommerce.getAllProducts = (tokens, callback) => {
-  const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2', tokens.wooKey, tokens.wooSecret);
-  Woocommerce.get('products', (err, data, res) => {
-    err ? callback(err, null) : callback(null, res);
+woocommerce.getAllProducts = (tokens) => {
+  return new Promise((resolve) => {
+    const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2', tokens.wooKey, tokens.wooSecret);
+    Woocommerce.get('products/?per_page=75', (err, data, res) => {
+      if(err) {
+        resolve({ ok: false, 'Error': err });
+      } else {
+        resolve(JSON.parse(res));
+      }
+    });
   });
 }
 

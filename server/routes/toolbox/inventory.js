@@ -20,7 +20,7 @@ router.get('/syncInventory', passport.authenticate('jwt', { session:false }), as
 });
 
 // Create Products
-router.put('/createProducts', passport.authenticate('jwt', { session:false }), (req, res) => {
+router.put('/createProducts', passport.authenticate('jwt', { session:false }), async (req, res) => {
   const products = req.body.products;
   if(products.length > 1) {
     products.forEach((product) => {
@@ -28,55 +28,50 @@ router.put('/createProducts', passport.authenticate('jwt', { session:false }), (
     });
   } else {
     products[0]['userId'] = req.user._id
-  }
+  };
   
-  inventory.addProducts(products, (err, response) => {
-    err ? res.json({error: err}) : res.json(response);
-  });
+  const product = await inventory.addProducts(products);
+  res.json(product);
 });
 
 // Update Products
-router.post('/updateProducts', passport.authenticate('jwt', { session:false }), (req, res) => {
+router.post('/updateProducts', passport.authenticate('jwt', { session:false }), async (req, res) => {
   const products = req.body.products;
   // userId is just used for double verification.
   const userId = req.user._id;
 
-  inventory.updateProducts(products, userId, (err, response) => {
-    err ? res.json({error: err}) : res.json(response);
-  });
+  const update = await inventory.updateProducts(products, userId);
+  res.json(update);
 });
 
 // Get Products
-router.get('/getProducts', passport.authenticate('jwt', {session: false}), (req, res) => {
+router.get('/getProducts', passport.authenticate('jwt', {session: false}), async (req, res) => {
   // Search products collection with the user id.
   const userId = req.user._id;
 
-  inventory.getProducts(userId, (err, products) => {
-    err ? res.json({error: err}) : res.json(products);
-  });
+  const products = await inventory.getProducts(userId);
+  res.json(products);
 });
 
 // Delete Products
-router.post('/deleteProducts', passport.authenticate('jwt', {session: false}), (req, res) => {
+router.post('/deleteProducts', passport.authenticate('jwt', {session: false}), async (req, res) => {
   const products = req.body.items;
   // userId is just used for double verification.
   const userId = req.user._id;
 
-  inventory.deleteProducts(products, userId, (err, deleted) => {
-    err ? res.json({error: err}) : res.json(deleted);
-  });
+  const deleted = await inventory.deleteProducts(products, userId);
+  res.json(deleted);
 });
 
 // Link Items
-router.post('/linkItems', passport.authenticate('jwt', {session: false}), (req, res) => {
+router.post('/linkItems', passport.authenticate('jwt', {session: false}), async (req, res) => {
   const toolboxItem = req.body.toolboxItem[0];
   const marketplaceItem = req.body.marketplaceItem[0];
   // userId is just used for double verification.
   const userId = req.user._id;
 
-  inventory.linkItems(toolboxItem, marketplaceItem, userId, (err, linked) => {
-    err ? res.json({error: err}) : res.json(linked);
-  });
+  const linked = await inventory.linkItems(toolboxItem, marketplaceItem, userId);
+  res.json(linked);
 });
 
 module.exports = router;

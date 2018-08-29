@@ -64,181 +64,155 @@ inventory.syncInventory = async (userId) => {
 }
 
 // Add products
-inventory.addProducts = (productsQuery, callback) => {
-  const created = [];
-
-  // Create each product that was submitted. Push each product into the 'created' array and pass it to the callback when we init the promise.
-  const createProducts = () => {
-    return new Promise((resolve, reject) => {
-
-      // console.log(productsQuery);
-
-      productsQuery.forEach((product) => {
-        created.push(product);
-        const createProducts = Products(product);
-        createProducts.save((err, response) => {
-          err ? reject(err) : resolve();
-        })
+inventory.addProducts = (productsQuery) => {
+  // Create each product that was submitted.
+  return new Promise((resolve) => {
+    for(const product of productsQuery) {
+      const createProducts = Products(product);
+      createProducts.save((err) => {
+        if(err) {
+          resolve({ ok: false, 'Error': err });
+        } else {
+          resolve({ ok: true, 'Success': 'Product(s) have been created' });
+        }
       });
-    });
-  }
-
-  // Init the promise.
-  createProducts()
-    .then(() => {
-      callback(null, created);
-    })
-  .catch((err) => {
-    callback(err, null);
+    };
   });
-}
+};
 
 // Update products
-inventory.updateProducts = (productsQuery, userId, callback) => {
+inventory.updateProducts = (productsQuery, userId) => {
   const updated = [];
-
-  // Update each product from the entire list. Push each product into the 'updated' array and pass it to the callback when we init the promise.
+  // Update each product from the entire list. Push each product into the 'updated' array
   // Currenty it updates even if there was no edit. Fix it so that it will only update items that have been edited.
-  const updateProducts = () => {
-    return new Promise((resolve, reject) => {
-      productsQuery.forEach((product) => {
-        console.log(product.location);
-        updated.push(product);
-        const update = {
-          sku: product.sku,
-          title: product.title,
-          quantity: {
-            quantity: product.quantity.quantity,
-            availableQuantity: product.quantity.availableQuantity,
-            alertQuantity: product.quantity.alertQuantity,
-            pendingOrders: product.quantity.pendingOrders,
-            neededQuantity: product.quantity.alertQuantity - product.quantity.quantity > 0 ? product.quantity.alertQuantity - product.quantity.quantity : 0
-          },
-          description: product.description,
-          price: {
-            sellPrice: 0,
-            purchasePrice: product.price.purchasePrice,
-            stockValue: product.price.stockValue
-          },
-          category: product.category,
-          variationGroup: product.variationGroup,
-          upc: product.upc,
-          barcode: product.barcode,
-          images: product.images,
-          condition: product.condition,
-          location: {
-            fullAddress: product.location.fullAddress,
-            company: product.location.company,
-            name: product.location.name,
-            address1: product.location.address1,
-            address2: product.location.address2,
-            city: product.location.city,
-            state: product.location.state,
-            zip: product.location.zip,
-            country: product.location.country,
-            email: product.location.email,
-            phone: product.location.phone
-          },
-          detail: {
-            weight: product.detail.weight,
-            height: product.detail.height,
-            width: product.detail.width,
-            depth: product.detail.depth
-          },
-          binLocation: product.binLocation,
-          monitor: product.monitor,
-          modifiedDate: product.modifiedDate,
-        }
-        Products.update({_id: product.id, userId: userId}, update, (err, item) => {
-            err ? reject(err) : resolve(item);
-        });
+  return new Promise((resolve) => {
+    for(const product of productsQuery) {
+      updated.push(product);
+      const update = {
+        sku: product.sku,
+        title: product.title,
+        quantity: {
+          quantity: product.quantity.quantity,
+          availableQuantity: product.quantity.availableQuantity,
+          alertQuantity: product.quantity.alertQuantity,
+          pendingOrders: product.quantity.pendingOrders,
+          neededQuantity: product.quantity.alertQuantity - product.quantity.quantity > 0 ? product.quantity.alertQuantity - product.quantity.quantity : 0
+        },
+        description: product.description,
+        price: {
+          sellPrice: 0,
+          purchasePrice: product.price.purchasePrice,
+          stockValue: product.price.stockValue
+        },
+        category: product.category,
+        variationGroup: product.variationGroup,
+        upc: product.upc,
+        barcode: product.barcode,
+        images: product.images,
+        condition: product.condition,
+        location: {
+          fullAddress: product.location.fullAddress,
+          company: product.location.company,
+          name: product.location.name,
+          address1: product.location.address1,
+          address2: product.location.address2,
+          city: product.location.city,
+          state: product.location.state,
+          zip: product.location.zip,
+          country: product.location.country,
+          email: product.location.email,
+          phone: product.location.phone
+        },
+        detail: {
+          weight: product.detail.weight,
+          height: product.detail.height,
+          width: product.detail.width,
+          depth: product.detail.depth
+        },
+        binLocation: product.binLocation,
+        monitor: product.monitor,
+        modifiedDate: product.modifiedDate,
+      }
+      Products.update({_id: product.id, userId: userId}, update, (err, item) => {
+        if(err) {
+          resolve({ ok: false, 'Error': err });
+        } else {
+          resolve({ok: true, 'Success': 'Item(s) have been updated'});
+        };
       });
-    });
-  }
-  updateProducts()
-    .then(() => {
-      callback(null, updated);
-    })
-  .catch((err) => {
-    callback(err, null);
+    };
   });
-}
+};
 
 // Get products
-inventory.getProducts = (userId, callback) => {
-  Products.find({userId: userId}).exec()
-    .then((products) => {
-      callback(null, products);
-    })
-  .catch((err) => {
-    callback(err, null);
-  });
+inventory.getProducts = async (userId) => {
+  const products = await Products.find({userId: userId}).exec();
+  return products;
 }
 
 // Delete products
-inventory.deleteProducts = (products, userId, callback) => {
+inventory.deleteProducts = (products, userId) => {
   if(typeof products === 'string') {
-    // Get the products to be deleted from Angular then delete it.
-    Products.find({_id: products, userId: userId}).remove().exec()
-      .then((deleted) => {
-        callback(null, deleted);
-    }).catch((err) => {
-      callback(err, null);
+    return new Promise((resolve) => {
+      // Get the products to be deleted from Angular then delete it.
+      Products.find({_id: products, userId: userId}).remove((err) => {
+        if(err) {
+          resolve({ ok: false, 'Error': err });
+        } else {
+          resolve({ ok: true, 'Success': 'Item has been deleted' });
+        }
+      });
     });
   } else {
-
-    const deleteMultiProducts = () => {
-      return new Promise((resolve, reject) => {
-        products.forEach((product) => {
-          Products.find({_id: product}).remove().exec()
-            .then((product) => {
-              resolve(product);
-            })
-          .catch((err) => {
-            reject(err);
-          });
-        });
-      });
-    };
-
-    deleteMultiProducts()
-      .then((deleted) => {
-        callback(null, deleted);
-      })
-    .catch((err) => {
-      callback(err, null);
-    });
-  }
-}
-
-// Link an item
-inventory.linkItems = (toolboxItem, marketplaceItem, userId, callback) => {
-  // Currently only works for Woo items. Adjust later for all marketplaces when integrating their apis
-  Products.findOne({_id: toolboxItem._id, userId: userId}).exec()
-    .then((item) => {
-      // item.linked.woocommerce = [];
-      // item.save();
-      if(item.linked.woocommerce.length > 0) {
-        const index = item.linked.woocommerce.map(each => { return each.id }).indexOf(marketplaceItem.id);
-        if(index > -1) {
-          throw 'This item is already linked.';
-        } else {
-          // item.linked.woocommerce = [];
-          item.linked.woocommerce.push(marketplaceItem);
-          item.save((err, linked) => {
-            err ? callback(err, null) : callback(null, linked);
-          });
-        }
-      } else {
-        item.linked.woocommerce.push(marketplaceItem);
-        item.save((err, linked) => {
-          err ? callback(err, null) : callback(null, linked);
+    return new Promise((resolve) => {
+      for(const product of products) {
+        Products.find({_id: product}).remove((err) => {
+          if(err) {
+            resolve({ ok: false, 'Error': err });
+          } else {
+            resolve({ ok: true, 'Success': 'Item\'s have been deleted' });
+          }
         });
       }
-    })
-  .catch((err) => {
-    callback(err, null);
-  })
-}
+    });
+  };
+};
+
+// Link an item
+inventory.linkItems = (toolboxItem, marketplaceItem, userId) => {
+  return new Promise((resolve) => {
+    // Currently only works for Woo items. Adjust later for all marketplaces when integrating their apis
+    Products.findOne({_id: toolboxItem._id, userId: userId}, (err, item) => {
+      if(err) {
+        resolve({ ok: false, 'Error': err });
+      } else {
+        if(item.linked.woocommerce.length > 0) {
+          const index = item.linked.woocommerce.map(each => { return each.id }).indexOf(marketplaceItem.id);
+          if(index > -1) {
+            resolve({ ok: false, 'Error': 'This item is already linked.' });
+          } else {
+            item.linked.woocommerce.push(marketplaceItem);
+            item.save((err, linked) => {
+              if(err) {
+                resolve({ ok: false, 'Error': err });
+              } else {
+                resolve({ ok: true, linked });
+              }
+            });
+          }
+        } else {
+          item.linked.woocommerce.push(marketplaceItem);
+          item.save((err, linked) => {
+            if(err) {
+              resolve({ ok:false, 'Error': err });
+            } else {
+              resolve({ ok: true, linked });
+            };
+          });
+        };
+      };
+    });
+  });
+};
 
 module.exports = inventory;

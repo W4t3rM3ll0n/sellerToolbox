@@ -25,7 +25,6 @@ export class CreateProductsComponent implements OnInit {
     this.authService.getProfile()
       .subscribe((user) => {
         this.user = user;
-        // console.log(this.user);
       })
     // Initialize the form
     this.createProductsForm = this._fb.group({
@@ -43,7 +42,7 @@ export class CreateProductsComponent implements OnInit {
       'quantity': this._fb.group({
         'quantity': [''],
         'availableQuantity': [''],
-        'alertQuantity': [''],
+        'alertQuantity': [0],
         'pendingOrders': [0],
         'neededQuantity': [0],
       }),
@@ -74,17 +73,16 @@ export class CreateProductsComponent implements OnInit {
   onCreateProducts() {
     // console.log(this.createProductsForm);
     const productsDetail = this.createProductsForm.value.products;
+    // Set available quantity the same as quantity
+    for(const product of productsDetail) {
+      product.quantity.availableQuantity = product.quantity.quantity;
+    }
 
     this.toolboxService.createItems(productsDetail)
       .subscribe((res) => {
-        // console.log(res);
+        console.log(res);
         this.router.navigate(['/toolbox/inventory']);
-      },
-      (err) => {
-        console.log(err);
-        return false;
       });
-      
   }
 
   // Add Row Button

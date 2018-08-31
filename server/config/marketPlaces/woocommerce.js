@@ -73,7 +73,7 @@ woocommerce.getOrdersByStatus = (tokens, status) => {
 
 // Update Woo orders in the marketplace
 woocommerce.updateOrders = (tokens, orders, action, options, userId) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const Woocommerce = oAuth('https://publifiedlabs.com/apiTest', 'wc/v2', tokens.wooKey, tokens.wooSecret);
     const data = action;
     const keyNames = Object.keys(data);

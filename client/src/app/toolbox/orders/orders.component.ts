@@ -27,11 +27,11 @@ export class OrdersComponent implements OnInit {
     .subscribe((orders) => {
       this.orders = orders;
     });
-  }
+  };
 
   onSearchOrders(form: NgForm) {
     console.log(form.value);
-  }
+  };
   
   onSelectItem(i: number) {
     // If row is selected, highlight the row.
@@ -46,12 +46,12 @@ export class OrdersComponent implements OnInit {
       this.tag[i + 1].setAttribute('style', 'background-color: rgba(255, 255, 255, 0.3);');
       this.tag[i + 1]['selected'] = 'yes';
       this.selectedOrders.push(this.orders.orders[i]);
-    }
-  }
+    };
+  };
   
   onEditOrders() {
     this.editModeOff = !this.editModeOff;
-  }
+  };
 
   onDeleteSingleOrder(i: number) {
     const dblCheck = confirm('Are you sure you want to delete this order?');
@@ -74,8 +74,8 @@ export class OrdersComponent implements OnInit {
       err => console.log(err));
     } else {
       return false;
-    }
-  }
+    };
+  };
 
   onDeleteMultiOrders() {
     // console.log(this.selectedOrders);
@@ -99,10 +99,10 @@ export class OrdersComponent implements OnInit {
           const index = this.orders.orders.indexOf(this.selectedOrders[j]);
           // console.log(index);
           this.orders.orders.splice(index, 1);
-        }
-      }
-    }
-  }
+        };
+      };
+    };
+  };
 
   onSelectOrderFilter(e?) {
     this.resetToDefault();
@@ -119,8 +119,8 @@ export class OrdersComponent implements OnInit {
         console.log(orders);
         this.orders = orders;
       });
-    }
-  }
+    };
+  };
 
   onPrintOrders() {
     const dblCheck = confirm('Are you sure you want to print and mark order\'s as completed?');
@@ -143,8 +143,8 @@ export class OrdersComponent implements OnInit {
         });
     } else {
       return false;
-    }
-  }
+    };
+  };
 
   openDropdown() {
     this.isOpen = !this.isOpen;
@@ -153,8 +153,8 @@ export class OrdersComponent implements OnInit {
       document.getElementById('dropdownToggle').className += ' show';
     } else {
       document.getElementById('dropdownToggle').className = 'dropdown-menu';
-    }
-  }
+    };
+  };
 
   onUpdateOrders(options?: string) {
     if(this.selectedOrders.length > 0) {
@@ -169,8 +169,8 @@ export class OrdersComponent implements OnInit {
           this.ngOnInit();
         });
       });
-    }
-  }
+    };
+  };
 
   resetToDefault() {
     this.editModeOff = true;
@@ -178,15 +178,16 @@ export class OrdersComponent implements OnInit {
     for(let i = 0; i < this.tag.length; i++) {
       this.tag[i].setAttribute('style', '');
       this.tag[i]['selected'] = 'no';
-    }
-  }
+    };
+  };
 
-  onSaveOrders() {
-    this.toolboxService.saveOrders()
+  onSyncOrders() {
+    this.toolboxService.syncOrders()
       .subscribe((saved) => {
         console.log(saved);
+        this.ngOnInit();
       },
       err => console.log(err));
-  }
+  };
 
 }

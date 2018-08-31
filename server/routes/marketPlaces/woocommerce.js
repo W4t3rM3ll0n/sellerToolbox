@@ -51,14 +51,14 @@ router.post('/updateWooOrders', passport.authenticate('jwt', { session:false }),
   const orders = req.body.orders;
   const action = req.body.action;
   const options = req.body.options;
-  const userId = req.user._id;
-  const tokens = req.user.tokens;
+  const user = req.user;
 
   // updateOrders takes 3 possible parameters
+    // @tokens - Woo tokens to make an API call to Woocommerce
     // @orders - Array of orders, pass empty array if not using
     // @actions - Object of the action being taken which consists of an array
     // @options - The type of action to be performs. e.g. 'mark completed'
-  const updated = await configWoo.updateOrders(tokens, orders, action, options, userId);
+  const updated = await configWoo.updateOrders(user.tokens, orders, action, options, user._id);
   res.json({updated});
 });
 

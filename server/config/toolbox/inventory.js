@@ -204,7 +204,7 @@ inventory.linkItems = (toolboxItem, marketplaceItem, userId) => {
           item.linked.woocommerce.push(marketplaceItem);
           item.save((err, linked) => {
             if(err) {
-              resolve({ ok:false, 'Error': err });
+              resolve({ ok: false, 'Error': err });
             } else {
               resolve({ ok: true, linked });
             };
@@ -212,6 +212,92 @@ inventory.linkItems = (toolboxItem, marketplaceItem, userId) => {
         };
       };
     });
+  });
+};
+
+// Get products from Woocommerce and save to database
+inventory.importWooInv = async (products, user) => {
+  // Get products from database
+  const dbProds = await Products.find({ userId: user._id }).exec();
+
+  return new Promise((resolve) => {
+    // Loop through Woo products
+    for(const product of products) {
+      // Get `values` from product
+      const { sku, name, type, manage_stock, stock_quantity, description, images, regular_price, categories, weight, dimensions } = product;
+      // Check to see if the product exists in database
+      const exist = dbProds.find(x => x.sku === product.sku);
+  
+      // If the product does not exist
+      if(!exist) {
+        if(type === 'simple' && manage_stock) {
+          // Get the users primary address
+          let address;
+          for(const addy of user.addresses) {
+            if(addy.primary) {
+              address = addy;
+            };
+          };
+  
+          // Create the object to query to database
+          const productQuery = {
+            sku: sku,
+            title: name,
+            quantity: {
+              quantity: stock_quantity,
+              availableQuantity: stock_quantity,
+              alertQuantity: 0,
+              pendingOrders: 0,
+              neededQuantity: 0
+            },
+            orders: [],
+            description: description,
+            upc: '',
+            barcode: '',
+            images: images[0].src,
+            condition: '',
+            price: {
+              sellPrice: regular_price,
+              purchasePrice: 0,
+              stockValue: 0
+            },
+            category: categories[0].name,
+            variationGroup: '',
+            location: {
+              fullAddress: address.fullAddress,
+              company: address.company,
+              name: address.name,
+              address1: address.address1,
+              address2: address.address2,
+              city: address.city,
+              state: address.state,
+              zip: address.zip,
+              country: address.country
+            },
+            detail: {
+              weight: weight,
+              height: dimensions.height,
+              width: dimensions.width,
+              depth: dimensions.length
+            },
+            binLocation: '',
+            monitor: true,
+            createdDate: new Date(),
+            userId: user._id
+          };
+  
+          // Persist the product to the database
+          Products(productQuery).save(async (err, tbProd) => {
+            if(err) {
+              resolve({ ok: false, 'Error': err });
+            } else {
+              await inventory.linkItems(tbProd, product, user._id);
+              resolve({ ok: true, 'Success': 'Items have been imported and linked' });
+            };
+          });
+        };
+      };
+    };
   });
 };
 

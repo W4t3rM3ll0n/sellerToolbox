@@ -63,7 +63,6 @@ const productsSchema = new Schema({
     createdDate: Date,
     modifiedDate: Date,
     userId: String
-    
 });
 
 const products = mongoose.model('Products', productsSchema);

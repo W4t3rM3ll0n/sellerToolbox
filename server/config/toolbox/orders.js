@@ -18,10 +18,10 @@ const baseDir = path.join(__dirname, '/../../.data');
 orders.getAllOrders = async (userId) => {
   const orders = await Orders.find({ userId }).exec();
   return orders;
-}
+};
 
 // Save orders to the database.
-orders.saveOrders = async (orders, user) => {
+orders.syncOrders = async (orders, user) => {
   // Loop through orders
   for(const order of orders) {
     order.marketplace = 'woocommerce'; // Currently setting marketplace manually. Change to be dynamic.
@@ -42,12 +42,12 @@ orders.saveOrders = async (orders, user) => {
         for(const address of user.addresses) {
           if(address.primary) {
             shipFrom = address;
-          }
-        }
-      }
+          };
+        };
+      };
 
       // If finds === 0, order does not exist in database
-      if(finds.length === 0) {
+      if(finds.length === 0 && order.status === 'processing') {
         // Create the order object
         const orderObj = {
           marketplaceID: order.id,
@@ -101,13 +101,13 @@ orders.saveOrders = async (orders, user) => {
           completedDate: order.date_completed,
           status: order.status,
           userId: user._id
-        }
+        };
         // Insert order object to database
         await Orders.create(orderObj);
-      }
-    }
-  }
-}
+      };
+    };
+  };
+};
 
 // Update orders
 orders.updateOrders = async (orders, options, userId) => {
@@ -166,12 +166,12 @@ orders.updateOrders = async (orders, options, userId) => {
         product.quantity.pendingOrders = product.orders.length
 
         await Products.update({ _id }, product).exec();
-      }
-    }
+      };
+    };
     // Update the status of each order
     await Orders.update({ _id: order._id, userId: userId }, { status: options }).exec();
-  }
-}
+  };
+};
 
 // Delete orders
 orders.deleteOrders = async (orders) => {
@@ -183,14 +183,14 @@ orders.deleteOrders = async (orders) => {
     // Loop through orders
     for(const order of orders) {
       await Orders.find({ _id: order._id }).remove().exec();
-    }
-  }
-}
+    };
+  };
+};
 
 orders.getOrdersByStatus = async (status, userId) => {
   const orders = await Orders.find({status: status, userId: userId});
   return orders;
-}
+};
 
 // Get the exact date to the second during execution
 const dateNow = Date.now();
@@ -240,8 +240,8 @@ orders.createOrderLabels = async (orders, user) => {
 
         // Wait till orders are processed
         await processOrders();
-      }
-  }
+      };
+  };
 
   // Process all the orders and save the png
   function processOrders() {
@@ -377,12 +377,12 @@ orders.createOrderLabels = async (orders, user) => {
       } catch(e) {
         // Eventually we will have to make it so errors report the specific order that had an error.
         console.log(e)
-      }
+      };
     });
-  }
+  };
   // Wait till the create Folders is completed
   await createFolder();
-}
+};
 
 // Save files to pdf
 orders.printOrderLabels = async () => {
@@ -430,18 +430,17 @@ orders.printOrderLabels = async () => {
           i++
           if(i === fileNames.length-1) {
             resolve();
-          }
-        }
-
+          };
+        };
       });
     });
-  }
+  };
   await mergeLabels();
 
   // Save pdf file in record
   pdf.pipe(fs.createWriteStream(`${baseDir}/orders/${fullDate}/${today}/labels.pdf`));
   // End the pdf library and create pdf file
   pdf.end();
-}
+};
 
 module.exports = orders;

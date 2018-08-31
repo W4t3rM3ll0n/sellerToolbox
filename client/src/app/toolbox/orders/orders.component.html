@@ -9,7 +9,7 @@
       ngModel
       placeholder="Search">
     <button class="btn btn-secondary mr-sm-2" type="submit">Search</button>
-    <button type="button" class="btn btn-success mr-sm-2" (click)="onSaveOrders()">Sync Orders</button>
+    <button type="button" class="btn btn-success mr-sm-2" (click)="onSyncOrders()">Sync Orders</button>
 </form>
 <hr>
 
@@ -21,10 +21,10 @@
   <select class="custom-select mr-sm-2" (change)="onSelectOrderFilter($event)">
     <option value="processing">Processing Orders</option>
     <option value="completed">Completed Orders</option>
-    <option value="pending">Pending Orders</option>
+    <!-- <option value="pending">Pending Orders</option>
     <option value="on-hold">On Hold</option>
     <option value="cancelled">Cancelled</option>
-    <option value="refunded">Refunded</option>
+    <option value="refunded">Refunded</option> -->
     <option value="all">All Orders</option>
   </select>
   <button type="button" class="btn btn-outline-success mr-sm-2 float-right" (click)="onPrintOrders()">Print</button>

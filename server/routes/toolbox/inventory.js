@@ -5,6 +5,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
 const inventory = require('../../config/toolbox/inventory');
+const configWoo = require('../../config/marketPlaces/woocommerce');
 
 // Main Page
 router.get('/', (req, res) => {
@@ -23,11 +24,11 @@ router.get('/syncInventory', passport.authenticate('jwt', { session:false }), as
 router.put('/createProducts', passport.authenticate('jwt', { session:false }), async (req, res) => {
   const products = req.body.products;
   if(products.length > 1) {
-    products.forEach((product) => {
-      product['userId'] = req.user._id
-    });
+    for(const product of products) {
+      product['userId'] = req.user._id;
+    };
   } else {
-    products[0]['userId'] = req.user._id
+    products[0]['userId'] = req.user._id;
   };
   
   const product = await inventory.addProducts(products);
@@ -72,6 +73,20 @@ router.post('/linkItems', passport.authenticate('jwt', {session: false}), async 
 
   const linked = await inventory.linkItems(toolboxItem, marketplaceItem, userId);
   res.json(linked);
+});
+
+// Import Inventory from Woocommerce
+router.get('/importWooInv', passport.authenticate('jwt', {session: false}), async (req, res) => {
+  // Get all products from Woocommerce.
+  const user = req.user;
+  const products = await configWoo.getAllProducts(user.tokens);
+
+  // Pass products to helper function (We use a promise for increased performance)
+  inventory.importWooInv(products, user)
+    .then(imported => {
+      // Respond with success or error message
+      res.json(imported);
+    });
 });
 
 module.exports = router;

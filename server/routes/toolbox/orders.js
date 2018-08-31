@@ -18,17 +18,19 @@ router.get('/getAllOrders', passport.authenticate('jwt', { session: false }), as
   res.json({ orders });
 });
 
-// Save orders from Woocommerce
-router.get('/saveOrders', passport.authenticate('jwt', { session: false }), async (req, res) => {
+// Sync orders from Woocommerce
+router.get('/syncOrders', passport.authenticate('jwt', { session: false }), async (req, res) => {
   const user = req.user;
   const orders = await configWoo.getAllOrders(user.tokens);
 
-  await configOrders.saveOrders(orders, user).then(() => {
-    res.json({ success: 'Orders have been saved' });
-  }).catch(error => {
-    console.log(error);
-    res.json({ error: 'Save orders error: '+error })
-  });
+  // The catch might not be doing anything (refactor later on)
+  configOrders.syncOrders(orders, user)
+    .then(() => {
+      res.json({ success: 'Orders have been synced' });
+    })
+    .catch(error => {
+      res.json({ error: 'Sync orders error: '+error })
+    });
 });
 
 // Update orders status

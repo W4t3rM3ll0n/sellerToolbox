@@ -115,12 +115,10 @@ export class InventoryComponent implements OnInit, OnDestroy {
         const searchWord = new RegExp(word, 'i');
   
         control.value.forEach((row) => {
-  
           if(row.title.match(searchWord)) {
             // keepIndex = control.value.indexOf(row);
             row['keep'] = true;
-          }
-  
+          };
         });
       });
       
@@ -246,18 +244,32 @@ export class InventoryComponent implements OnInit, OnDestroy {
     };
   };
 
+  // Import inventory from Woocommerce
+  onImportWooInv() {
+    const dblCheck = confirm('Are you sure you want to import the items from Woocommerce?');
+    if(dblCheck) {
+      this.toolboxService.importWooInv()
+        .subscribe((res) => {
+          console.log(res);
+          this.ngOnInit();
+        });
+    } else {
+      return false;
+    };
+  };
+
   resetToDefault(rowIndex?: number) {
     this.editModeOff = true;
     this.selectedRows = [];
     for(let i = 0; i < this.tag.length; i++) {
       this.tag[i].setAttribute('style', '');
       this.tag[i]['selected'] = 'no';
-    }
-  }
+    };
+  };
 
   ngOnDestroy() {
     // console.log('destroyed');
     this.resetToDefault();
-  }
+  };
 
 }

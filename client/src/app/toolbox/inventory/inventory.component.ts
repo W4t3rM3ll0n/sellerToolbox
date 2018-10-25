@@ -15,7 +15,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
   updateProductsForm: FormGroup;
   inventory: Array<InventoryGroupRow>;
   selectedRows: Array<ProductGroupRow> = [];
-  tag: HTMLCollection = document.getElementsByTagName('tr');
+  tag: HTMLCollection | NodeListOf<HTMLTableRowElement> = document.getElementsByTagName('tr');
 
   // User
   user: object; // Change the type later.

@@ -98,7 +98,7 @@ inventory.addProducts = (productsQuery, addresses) => {
 
       // Create && save the product
       const createProducts = Products(product);
-
+      
       createProducts.save((err) => {
         if(err) {
           resolve({ ok: false, 'Error': err });

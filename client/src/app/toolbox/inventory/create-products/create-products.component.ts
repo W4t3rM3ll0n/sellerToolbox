@@ -57,7 +57,7 @@ export class CreateProductsComponent implements OnInit {
       'barcode': [''],
       'images': [''],
       'condition': [''],
-      'location': [''],
+      'location': [''], // ***
       'detail': this._fb.group({
         'weight': [0],
         'height': [0],
@@ -70,7 +70,7 @@ export class CreateProductsComponent implements OnInit {
   }
 
   // Create Products Button
-  onCreateProducts() {
+  onCreateProducts(): void {
     // console.log(this.createProductsForm);
     const productsDetail = this.createProductsForm.value.products;
     // Set available quantity the same as quantity
@@ -80,8 +80,13 @@ export class CreateProductsComponent implements OnInit {
 
     this.toolboxService.createItems(productsDetail)
       .subscribe((res) => {
-        console.log(res);
-        this.router.navigate(['/toolbox/inventory']);
+        if(res.ok) {
+          console.log(res);
+          this.router.navigate(['/toolbox/inventory']);
+        } else {
+          console.error(res);
+          return;
+        }
       });
   }
 

@@ -15,7 +15,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
   updateProductsForm: FormGroup;
   inventory: Array<InventoryGroupRow>;
   selectedRows: Array<ProductGroupRow> = [];
-  tag: NodeListOf<Element> | Array<HTMLTableElement> = document.getElementsByTagName('tr');
+  tag: HTMLCollection = document.getElementsByTagName('tr');
 
   // User
   user: object; // Change the type later.
@@ -50,7 +50,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
     });
     const control = <FormArray>this.updateProductsForm.controls['products'];
     // Initialize product rows with the items/data from the database.
-    this.inventory.forEach((item) => {
+    for(const item of this.inventory) {
       const data = this._fb.group({
         'id': [{value: item._id, disabled: true}],
         'images': [{value: item.images, disabled: true}],
@@ -98,7 +98,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
       });
       // Push to the empty array, above.
       control.push(data);
-    });
+    }
   }
   
   onSearchInventory(form: NgForm) {

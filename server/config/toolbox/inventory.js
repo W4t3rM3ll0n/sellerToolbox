@@ -64,11 +64,41 @@ inventory.syncInventory = async (userId) => {
 }
 
 // Add products
-inventory.addProducts = (productsQuery) => {
-  // Create each product that was submitted.
+inventory.addProducts = (productsQuery, addresses) => {
   return new Promise((resolve) => {
+    // Loop through products
     for(const product of productsQuery) {
+      // Set no image if image is not provided
+      if(product.images === '') {
+        product.images = '/assets/visuals/noimage.jpg';
+      }
+
+      // Set default address if address is not provided
+      if(product.location === '') {
+        // Loop through the addresses for user
+        for(const addy of addresses) {
+          // Find the primary address for user
+          if(addy.primary) {
+            product.location = {
+              fullAddress: addy.fullAddress,
+              company: addy.company,
+              name: addy.name,
+              address1: addy.address1,
+              address2: addy.address2,
+              city: addy.city,
+              state: addy.state,
+              zip: addy.zip,
+              country: addy.country,
+              email: addy.email,
+              phone: addy.phone
+            }
+          }
+        }
+      }
+
+      // Create && save the product
       const createProducts = Products(product);
+
       createProducts.save((err) => {
         if(err) {
           resolve({ ok: false, 'Error': err });

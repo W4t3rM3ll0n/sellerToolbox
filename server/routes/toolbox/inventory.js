@@ -23,15 +23,17 @@ router.get('/syncInventory', passport.authenticate('jwt', { session:false }), as
 // Create Products
 router.put('/createProducts', passport.authenticate('jwt', { session:false }), async (req, res) => {
   const products = req.body.products;
+  const user = req.user;
+
   if(products.length > 1) {
     for(const product of products) {
-      product['userId'] = req.user._id;
+      product['userId'] = user._id;
     };
   } else {
-    products[0]['userId'] = req.user._id;
+    products[0]['userId'] = user._id;
   };
   
-  const product = await inventory.addProducts(products);
+  const product = await inventory.addProducts(products, user.addresses);
   res.json(product);
 });
 

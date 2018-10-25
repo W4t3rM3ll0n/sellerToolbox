@@ -1,0 +1,93 @@
+<h2>Orders</h2>
+<hr>
+<!-- Search Form -->
+<form class="form-inline" (ngSubmit)="onSearchOrders(s)" #s="ngForm">
+    <input 
+      class="form-control mr-sm-2"
+      type="text"
+      name="search"
+      ngModel
+      placeholder="Search">
+    <button class="btn btn-secondary mr-sm-2" type="submit">Search</button>
+    <button type="button" class="btn btn-success mr-sm-2" (click)="onSyncOrders()">Sync Orders</button>
+</form>
+<hr>
+
+<div class="form-inline">
+  <button type="button" class="btn btn-outline-warning mr-sm-2" routerLink="/toolbox/orders">Create</button>
+  <button type="button" class="btn btn-outline-warning mr-sm-2" (click)="onEditOrders()" *ngIf="editModeOff === true">Edit</button>
+  <button type="button" class="btn btn-outline-warning mr-sm-2" (click)="onEditOrders()" *ngIf="editModeOff === false">&times;</button>
+  <button type="button" class="btn btn-outline-danger mr-sm-2" (click)="onDeleteMultiOrders()" *ngIf="editModeOff === false">Delete</button>
+  <select class="custom-select mr-sm-2" (change)="onSelectOrderFilter($event)">
+    <option value="processing">Processing Orders</option>
+    <option value="completed">Completed Orders</option>
+    <!-- <option value="pending">Pending Orders</option>
+    <option value="on-hold">On Hold</option>
+    <option value="cancelled">Cancelled</option>
+    <option value="refunded">Refunded</option> -->
+    <option value="all">All Orders</option>
+  </select>
+  <button type="button" class="btn btn-outline-success mr-sm-2 float-right" (click)="onPrintOrders()">Print</button>
+  <ul class="nav nav-pills mr-sm-2">
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" (click)="openDropdown()" style="cursor: pointer;">Actions</a>
+      <div id="dropdownToggle" class="dropdown-menu">
+        <a class="dropdown-item" style="cursor: pointer;" (click)="onUpdateOrders('completed')">Mark as completed</a>
+        <a class="dropdown-item" style="cursor: pointer;" (click)="onUpdateOrders('processing')">Mark as Processing</a>
+        <!-- <a class="dropdown-item" style="cursor: pointer;" (click)="onUpdateOrders('pending')">Mark as Pending</a>
+        <a class="dropdown-item" style="cursor: pointer;" (click)="onUpdateOrders('cancelled')">Mark as Cancelled</a>
+        <a class="dropdown-item" style="cursor: pointer;" (click)="onUpdateOrders('on-hold')">Hold order</a> -->
+      </div>
+    </li>
+  </ul>
+</div>
+
+<hr>
+<!-- Orders Form -->
+<table class="table table-hover table-bordered">
+  <thead>
+    <tr class="table-success">
+      <th scope="col"></th>
+      <th scope="col">Order #</th>
+      <th scope="col">SKU</th>
+      <th scope="col">Item</th>
+      <th scope="col">Quantity</th>
+      <th scope="col">Total</th>
+      <th scope="col">Status</th>
+      <th scope="col">Date</th>
+      <th scope="col" *ngIf="editModeOff === false"></th>
+    </tr>
+  </thead>
+  <tbody *ngFor="let order of orders?.orders; let i = index;">
+    <tr (click)="onSelectItem(i)">
+      <td class="align-middle">{{i + 1}}</td>
+      <!-- View Mode -->
+      <td class="align-middle">
+        <span class="h5">{{ order.marketplaceID }}</span>
+      </td>
+      <td class="align-middle">
+        <li class="p" *ngFor="let item of order.orderItems" style="list-style: none">{{ item.sku }}</li>
+      </td>
+      <td class="align-middle">
+        <li class="p" *ngFor="let item of order.orderItems" style="list-style: none">{{ item.name }}</li>
+      </td>
+      <td class="align-middle">
+        <li class="h5" *ngFor="let item of order.orderItems" style="list-style: none">{{ item.quantity }}</li>
+      </td>
+      <td class="align-middle">
+        <span class="p">{{ order.total }}</span>
+      </td>
+      <td class="align-middle">
+        <span class="p">{{ order.status }}</span>
+      </td>
+      <td class="align-middle">
+        <span class="p">{{ order.createdDate | date }}</span>
+      </td>
+
+      <ng-template [ngIf]="editModeOff === false">
+        <td (click)="onDeleteSingleOrder(i)" class="align-middle" style="cursor: pointer;">&times;</td>
+      </ng-template>
+
+    </tr>
+  </tbody>
+</table>

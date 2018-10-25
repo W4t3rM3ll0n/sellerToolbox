@@ -1,5 +1,5 @@
 # Seller Toolbox
-A handy seller toolbox which helps online sellers maintain inventory, daily to dos, get analytic reports and more. Both the backend and frontend are housed inside the same repo.
+A handy seller toolbox which helps online sellers maintain inventory, daily to dos, get analytic reports and more.
 
 ## Getting Started
 
@@ -16,22 +16,10 @@ git clone https://github.com/akeon-lee/sellerToolbox.git
 Then cd into the directory
 
 ```
-cd /sellerToolbox
+cd /sellerToolbox/client && /sellerToolbox/server
 ```
 
-Install all the dependencies
-
-```
-npm install
-```
-
-Then from the root, cd into angular-src
-
-```
-cd /angular-src
-```
-
-Install all the dependencies
+Install all the dependencies in both directories
 
 ```
 npm install
@@ -59,10 +47,10 @@ node server.js
 
 `Terminal 2`
 
-cd into the angular-src from the root directory
+cd into the client from the root directory
 
 ```
-cd /angular-src
+cd /client
 ```
 
 Then run ng serve

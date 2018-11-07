@@ -23,7 +23,7 @@ users.addUser = (regUser, callback) => {
 
 // Get user by username
 users.getUserByUsername = (username, callback) => {
-  const query = {username: username}
+  const query = { username }
   Users.findOne(query, callback);
 }
 

@@ -27,7 +27,7 @@
     <option value="refunded">Refunded</option> -->
     <option value="all">All Orders</option>
   </select>
-  <button type="button" class="btn btn-outline-success mr-sm-2 float-right" (click)="onPrintOrders()">Print</button>
+  <button type="button" class="btn btn-outline-success mr-sm-2 float-right" (click)="onReadyOrders()">Ready</button>
   <ul class="nav nav-pills mr-sm-2">
     <li class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" (click)="openDropdown()" style="cursor: pointer;">Actions</a>
@@ -40,6 +40,7 @@
       </div>
     </li>
   </ul>
+  <button type="button" class="btn btn-outline-warning mr-sm-2 float-right" routerLink="/toolbox/printOrders">Print Orders</button>
 </div>
 
 <hr>

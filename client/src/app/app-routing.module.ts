@@ -27,6 +27,7 @@ import { OrdersComponent } from './toolbox/orders/orders.component';
 import { WoocommerceSettingsComponent } from './auth/user/woocommerce-settings/woocommerce-settings.component';
 import { WoocommerceComponent } from './toolbox/marketplaces/woocommerce/woocommerce.component';
 import { LinkItemsComponent } from './toolbox/inventory/link-items/link-items.component';
+import { PrintOrdersComponent } from './toolbox/orders/print-orders/print-orders.component';
 
 const appRoutes: Routes = [
     {path: '', component: HomeComponent},
@@ -36,7 +37,8 @@ const appRoutes: Routes = [
         { path: 'inventory', component: InventoryComponent },
         { path: 'createProducts', component: CreateProductsComponent },
         { path: 'linkItems', component: LinkItemsComponent },
-        { path: 'orders', component: OrdersComponent },
+        { path: 'orders', component: OrdersComponent},
+        { path: 'printOrders', component: PrintOrdersComponent },
         { path: 'toDo', component: ToDoComponent },
         { path: 'analytics', component: AnalyticsComponent },
         { path: 'woocommerce', component: WoocommerceComponent },

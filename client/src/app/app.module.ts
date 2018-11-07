@@ -37,6 +37,7 @@ import { WoocommerceSettingsComponent } from './auth/user/woocommerce-settings/w
 import { WoocommerceComponent } from './toolbox/marketplaces/woocommerce/woocommerce.component';
 import { MarketplaceService } from './toolbox/marketplaces/marketplace.service';
 import { LinkItemsComponent } from './toolbox/inventory/link-items/link-items.component';
+import { PrintOrdersComponent } from './toolbox/orders/print-orders/print-orders.component';
 
 @NgModule({
   declarations: [
@@ -67,7 +68,8 @@ import { LinkItemsComponent } from './toolbox/inventory/link-items/link-items.co
     OrdersComponent,
     WoocommerceSettingsComponent,
     WoocommerceComponent,
-    LinkItemsComponent
+    LinkItemsComponent,
+    PrintOrdersComponent
   ],
   imports: [
     BrowserModule,

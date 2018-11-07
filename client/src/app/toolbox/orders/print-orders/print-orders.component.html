@@ -1,0 +1,38 @@
+<h2>Print Order Labels</h2>
+<hr>
+<!-- Search Form -->
+<form class="form-inline" (ngSubmit)="onSearchOrderLabels(s)" #s="ngForm">
+  <input 
+    class="form-control mr-sm-2"
+    type="text"
+    name="search"
+    ngModel
+    placeholder="Search">
+  <button class="btn btn-secondary mr-sm-2" type="submit">Search</button>
+</form>
+<hr>
+<!-- Print Order Labels List -->
+<table class="table table-hover table-bordered">
+  <thead>
+    <tr class="table-success">
+      <th scope="col"></th>
+      <th scope="col">Date</th>
+      <th scope="col">Name</th>
+      <th scope="col">Download</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="align-middle">1</td>
+      <td class="align-middle">
+        <span class="p">Date</span>
+      </td>
+      <td class="align-middle">
+        <span class="p">Name</span>
+      </td>
+      <td class="align-middle">
+        <button class="btn btn-primary">Download</button>
+      </td>
+    </tr>
+  </tbody>
+</table>

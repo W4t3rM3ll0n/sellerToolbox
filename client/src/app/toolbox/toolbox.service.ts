@@ -165,11 +165,19 @@ export class ToolboxService {
       )
   }
 
-  printOrders(orders: object) {
+  readyOrders(orders: object) {
     const headers = this.httpHeader('application/json');
-    return this.http.post('http://localhost:3000/toolbox/orders/printOrders', { orders: orders }, { headers: headers })
+    return this.http.post('http://localhost:3000/toolbox/orders/readyOrders', { orders }, { headers })
       .pipe(
         map(orders => orders.json())
+      )
+  }
+
+  onTestPrint() {
+    const headers = this.httpHeader('application/pdf');
+    return this.http.get('http://localhost:3000/toolbox/orders/testPrint', { headers })
+      .pipe(
+        map(test => test)
       )
   }
 

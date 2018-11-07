@@ -76,28 +76,23 @@ router.post('/getOrdersByStatus', passport.authenticate('jwt', { session: false 
 });
 
 // Print and update orders as `completed`
-router.post('/printOrders', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.post('/readyOrders', passport.authenticate('jwt', { session: false }), async (req, res) => {
   const orders = req.body.orders;
   const user = req.user;
 
   await configOrders.createOrderLabels(orders, user);
   await configWoo.updateOrders(req.user.tokens, orders, {update: []}, 'completed');
   await configOrders.updateOrders(orders, 'completed', user._id);
-  await configOrders.printOrderLabels()
+  await configOrders.readyOrderLabels()
     .then(() => {
-      /* 
-       * Trying to send PDF to client 
-       * `test` is file path
-       */
-      // console.log(test);
-      // const fs = require('fs');
-      // fs.readFile(test , function (err,data){
-      //   res.contentType("application/pdf");
-      //   res.send(data);
-      // });
-      res.json({ success: 'Print order labels completed' });
+      res.json({ success: 'Your printing labels have been created.' });
     })
     .catch(error => res.json({ error: error.message }));
+});
+
+// Router to get the pdf labels to print
+router.get('/testPrint', async (req, res) => {
+  res.download('.data/orders/11-7-2018/1/labels.pdf');
 });
 
 module.exports = router;

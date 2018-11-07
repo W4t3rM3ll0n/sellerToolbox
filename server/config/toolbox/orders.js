@@ -385,7 +385,7 @@ orders.createOrderLabels = async (orders, user) => {
 };
 
 // Save files to pdf
-orders.printOrderLabels = async () => {
+orders.readyOrderLabels = async () => {
   // PDF creation
   const pdf = new PDFKit({
     size: 'LEGAL',

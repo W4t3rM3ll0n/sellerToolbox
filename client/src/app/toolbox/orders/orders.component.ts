@@ -13,7 +13,7 @@ export class OrdersComponent implements OnInit {
   wooOrders: object[]; // This property will be removed when orders is properly implemented through the database.
   orders: {orders: object[]}; 
   selectedOrders: object[] = [];
-  tag: NodeListOf<Element> | Array<HTMLTableElement> = document.getElementsByTagName('tr');
+  tag = document.getElementsByTagName('tr');
   orderFilter: string = 'processing';
   isOpen = false;
 
@@ -122,12 +122,12 @@ export class OrdersComponent implements OnInit {
     };
   };
 
-  onPrintOrders() {
+  onReadyOrders() {
     const dblCheck = confirm('Are you sure you want to print and mark order\'s as completed?');
 
     if(dblCheck) {
       // Send selectedOrders to server
-      this.toolboxService.printOrders(this.selectedOrders)
+      this.toolboxService.readyOrders(this.selectedOrders)
         .subscribe(res => {
           /* 
           * Trying to send PDF to client 
